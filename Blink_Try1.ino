@@ -8,6 +8,7 @@
 */
 
 #include <Servo.h>
+#include <Wire.h>
 
 Servo servoShoulderLeftLateral;
 Servo servoShoulderLeftFrontal;
@@ -36,6 +37,9 @@ void setup() {
   servoShoulderLeftLateral.write(servoShoulderLeftLateral_pos);
   servoShoulderLeftFrontal.write(servoShoulderLeftFrontal_pos);
   servoElbowLeft.write(servoElbowLeft_pos);
+
+  Wire.begin(8);
+  Wire.onReceive(receiveEvent);
 }
 
 void loop()
@@ -119,4 +123,15 @@ void loop()
       }  
     }
   }
+}
+
+// function that executes whenever data is received from master
+void receiveEvent(int howMany)
+{
+  while (0 <Wire.available())
+  {
+    char c = Wire.read();      /* receive byte as a character */
+    Serial.print(c);           /* print the character */
+  }
+  Serial.println();             /* to newline */
 }
