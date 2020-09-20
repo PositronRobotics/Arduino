@@ -10,20 +10,21 @@
 #include <Servo.h>
 #include <Wire.h>
 
-Servo servoShoulderLeftLateral;
-Servo servoShoulderLeftFrontal;
-Servo servoElbowLeft;
+#define SERVOSHOULDERRIGHTFRONT_POS_HOME 38
+#define SERVOSHOULDERRIGHTLATERAL_POS_HOME 159
+#define SERVOELBOWRIGHT 103
 
-int servoShoulderLeftLateral_pos = 38;
-int servoShoulderLeftFrontal_pos = 159;
-int servoElbowLeft_pos = 103;
+Servo servoShoulderRightFrontal;
+Servo servoShoulderRightLateral;
+Servo servoElbowRight;
 
-int prev_servoShoulderLeftLateral_pos = 0;
-int prev_servoShoulderLeftFrontal_pos = 0;
-int prev_servoElbowLeft_pos = 0;
+int servoShoulderRightFrontal_pos = SERVOSHOULDERRIGHTFRONT_POS_HOME;
+int servoShoulderRightLateral_pos = SERVOSHOULDERRIGHTLATERAL_POS_HOME;
+int servoElbowRight_pos = SERVOELBOWRIGHT;
 
 int zeroTo180=1;
 int m1=0;
+long driveMotorctr=0;
 
 char serInput=0;
 
@@ -32,32 +33,39 @@ char serInput=0;
 
 void setup() {
   Serial.begin(115200);
-  
-  servoShoulderLeftLateral.attach(9);  // attaches the servo on pin 9 to the servo object
-  servoShoulderLeftFrontal.attach(10);
-  servoElbowLeft.attach(11);
-  
-  servoShoulderLeftLateral.write(servoShoulderLeftLateral_pos);
-  servoShoulderLeftFrontal.write(servoShoulderLeftFrontal_pos);
-  servoElbowLeft.write(servoElbowLeft_pos);
 
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+
+  servoShoulderRightFrontal.attach(9);
 }
 
 void loop()
 {
   if(m1==0)
   {
-    Serial.print("M1 Off");
-    Serial.println();
+    //Serial.print("M1 Off");
+    //Serial.println();
   }
   else
   {
-    Serial.print("M1 Off");
-    Serial.println();    
+    //Serial.print("M1 On");
+    //Serial.println();
+
+    if(driveMotorctr++>=90000)
+    {
+      driveMotorctr=0;
+  
+      if(zeroTo180==1)
+      {
+        servoShoulderRightFrontal_pos++;
+        //servoShoulderRightFrontal.write(servoShoulderRightFrontal_pos);
+        
+        Serial.print(servoShoulderRightFrontal_pos);
+        Serial.println();
+      }      
+    }
   }
-  Serial.print(m1);
 }
 
 // function that executes whenever data is received from master
