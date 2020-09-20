@@ -58,12 +58,30 @@ void loop()
   
       if(zeroTo180==1)
       {
-        servoShoulderRightFrontal_pos++;
-        //servoShoulderRightFrontal.write(servoShoulderRightFrontal_pos);
+        if(servoShoulderRightFrontal_pos<180)
+        {
+          servoShoulderRightFrontal_pos++; 
+        }
+        else if(servoShoulderRightFrontal_pos==180)
+        {
+          zeroTo180=0;
+        }
+      }
+      else
+      {
+        if(servoShoulderRightFrontal_pos>0)
+        {
+          servoShoulderRightFrontal_pos--;
+        }
+        else if(servoShoulderRightFrontal_pos==0)
+        {
+          zeroTo180=1;
+        }
+      }
+      servoShoulderRightFrontal.write(servoShoulderRightFrontal_pos);
         
-        Serial.print(servoShoulderRightFrontal_pos);
-        Serial.println();
-      }      
+      Serial.print(servoShoulderRightFrontal_pos);
+      Serial.println();
     }
   }
 }
