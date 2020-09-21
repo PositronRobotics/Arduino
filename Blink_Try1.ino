@@ -97,9 +97,10 @@ void receiveEvent(int howMany)
     //Serial.print(c);           /* print the character */
     rcmd += (char)Wire.read();
   }
-  //Serial.print("Recd Cmd:");
-  //Serial.print(rcmd.substring(3,4));
-  //Serial.println();             /* to newline */
+  Serial.print("Recd Cmd:");
+  Serial.print(rcmd);
+  Serial.print(rcmd.substring(3,4));
+  Serial.println();             /* to newline */
 
   m1=(rcmd.substring(3,4)).toInt();
 }
