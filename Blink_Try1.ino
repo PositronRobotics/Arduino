@@ -90,17 +90,22 @@ void loop()
 void receiveEvent(int howMany)
 {
   String rcmd = "";
+
+  int i=0;
   
-  while (0 <Wire.available())
+  for (i=0; i<howMany;i++)
   {
-    //char c = Wire.read();      /* receive byte as a character */
-    //Serial.print(c);           /* print the character */
-    rcmd += (char)Wire.read();
+    char c = Wire.read();      /* receive byte as a character */
+    Serial.print(i);
+    Serial.println();
+    Serial.print(c);
+    Serial.println();
+    //rcmd += (char)Wire.read();
   }
-  Serial.print("Recd Cmd:");
-  Serial.print(rcmd);
-  Serial.print(rcmd.substring(3,4));
-  Serial.println();             /* to newline */
+  //Serial.print("Recd Cmd2:");
+  //Serial.print(rcmd);
+  //Serial.print(rcmd.substring(3,4));
+  //Serial.println();             /* to newline */
 
   m1=(rcmd.substring(3,4)).toInt();
 }
