@@ -91,21 +91,30 @@ void receiveEvent(int howMany)
 {
   String rcmd = "";
 
-  int i=0;
+  char a,b;
+  uint16_t numberRecd=0;
+
+  //int i=0;
   
-  for (i=0; i<howMany;i++)
-  {
-    char c = Wire.read();      /* receive byte as a character */
-    Serial.print(i);
+  //for (i=0; i<howMany;i++)
+  //{
+    
+    a = Wire.read();
+    b = Wire.read();
+    
+    numberRecd=a;
+    numberRecd=(numberRecd<<8)|b;
+    
+    Serial.print("Num recd:");
+    Serial.print(numberRecd);
     Serial.println();
-    Serial.print(c);
-    Serial.println();
+
     //rcmd += (char)Wire.read();
-  }
+  //}
   //Serial.print("Recd Cmd2:");
   //Serial.print(rcmd);
   //Serial.print(rcmd.substring(3,4));
   //Serial.println();             /* to newline */
 
-  m1=(rcmd.substring(3,4)).toInt();
+  //m1=(rcmd.substring(3,4)).toInt();
 }
