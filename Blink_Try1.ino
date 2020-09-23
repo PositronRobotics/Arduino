@@ -39,7 +39,10 @@ void loop()
 // function that executes whenever data is received from master
 void receiveEvent(int howMany)
 {
-  String rcmd = "";
+  String rcmd="";
+
+  char angleStr[4];
+  int angle=0;
   
   while (0 <Wire.available())
   {
@@ -49,6 +52,21 @@ void receiveEvent(int howMany)
   }
   Serial.print("Recd Cmd:");
   Serial.print(rcmd);
+  Serial.println();
+
+  angleStr[0]=rcmd[0];
+  angleStr[1]=rcmd[1];
+  angleStr[2]=rcmd[2];
+  angleStr[3]=rcmd[3];
+
+  Serial.print("angleStr:");
+  Serial.print(angleStr);
+  Serial.println();  
+
+  Serial.print("angle:");
+  sscanf(angleStr,"%04d",&angle);
+  Serial.print(angle);
+  
   //Serial.print(rcmd.substring(3,4));
   Serial.println();             /* to newline */
 
