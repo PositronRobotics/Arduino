@@ -35,86 +35,25 @@ void setup() {
   Serial.begin(115200);
 
   Wire.begin(8);
-  Wire.onReceive(receiveEvent);
 
   servoShoulderRightFrontal.attach(9);
 }
 
 void loop()
 {
-  if(m1==0)
-  {
-    //Serial.print("M1 Off");
-    //Serial.println();
-  }
-  else
-  {
-    //Serial.print("M1 On");
-    //Serial.println();
-
-    if(driveMotorctr++>=90000)
-    {
-      driveMotorctr=0;
-  
-      if(zeroTo180==1)
-      {
-        if(servoShoulderRightFrontal_pos<180)
-        {
-          servoShoulderRightFrontal_pos++; 
-        }
-        else if(servoShoulderRightFrontal_pos==180)
-        {
-          zeroTo180=0;
-        }
-      }
-      else
-      {
-        if(servoShoulderRightFrontal_pos>0)
-        {
-          servoShoulderRightFrontal_pos--;
-        }
-        else if(servoShoulderRightFrontal_pos==0)
-        {
-          zeroTo180=1;
-        }
-      }
-      servoShoulderRightFrontal.write(servoShoulderRightFrontal_pos);
-        
-      Serial.print(servoShoulderRightFrontal_pos);
-      Serial.println();
-    }
-  }
-}
-
-// function that executes whenever data is received from master
-void receiveEvent(int howMany)
-{
-  String rcmd = "";
-
-  char a,b;
-  uint16_t numberRecd=0;
-
-  //int i=0;
-  
-  //for (i=0; i<howMany;i++)
-  //{
-    
-    a = Wire.read();
-    b = Wire.read();
-    
-    numberRecd=a;
-    numberRecd=(numberRecd<<8)|b;
-    
-    Serial.print("Num recd:");
-    Serial.print(numberRecd);
-    Serial.println();
-
-    //rcmd += (char)Wire.read();
-  //}
-  //Serial.print("Recd Cmd2:");
-  //Serial.print(rcmd);
-  //Serial.print(rcmd.substring(3,4));
-  //Serial.println();             /* to newline */
-
-  //m1=(rcmd.substring(3,4)).toInt();
+  delay(2000);
+   
+  int16_t bigNum;
+   
+  byte a,b;
+  Wire.requestFrom(54,2);
+   
+  a = Wire.read();
+  b = Wire.read();
+   
+  bigNum = a;
+  bigNum = bigNum << 8 | b;
+   
+  Serial.print(bigNum);
+  Serial.print("\n");
 }
