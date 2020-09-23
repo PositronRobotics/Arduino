@@ -1,12 +1,3 @@
-/* Sweep
- by BARRAGAN <http://barraganstudio.com>
- This example code is in the public domain.
-
- modified 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Sweep
-*/
-
 #include <Servo.h>
 #include <Wire.h>
 
@@ -35,25 +26,31 @@ void setup() {
   Serial.begin(115200);
 
   Wire.begin(8);
+  Wire.onReceive(receiveEvent);
 
   servoShoulderRightFrontal.attach(9);
 }
 
 void loop()
 {
-  delay(2000);
-   
-  int16_t bigNum;
-   
-  byte a,b;
-  Wire.requestFrom(54,2);
-   
-  a = Wire.read();
-  b = Wire.read();
-   
-  bigNum = a;
-  bigNum = bigNum << 8 | b;
-   
-  Serial.print(bigNum);
-  Serial.print("\n");
+  delay(1);
+}
+
+// function that executes whenever data is received from master
+void receiveEvent(int howMany)
+{
+  String rcmd = "";
+  
+  while (0 <Wire.available())
+  {
+    //char c = Wire.read();      /* receive byte as a character */
+    //Serial.print(c);           /* print the character */
+    rcmd += (char)Wire.read();
+  }
+  Serial.print("Recd Cmd:");
+  Serial.print(rcmd);
+  //Serial.print(rcmd.substring(3,4));
+  Serial.println();             /* to newline */
+
+  //m1=(rcmd.substring(3,4)).toInt();
 }
