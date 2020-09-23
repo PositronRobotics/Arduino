@@ -66,6 +66,8 @@ void receiveEvent(int howMany)
   Serial.print("angle:");
   sscanf(angleStr,"%04d",&angle);
   Serial.print(angle);
+
+  servoShoulderRightFrontal.write(angle);
   
   //Serial.print(rcmd.substring(3,4));
   Serial.println();             /* to newline */
