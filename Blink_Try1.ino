@@ -30,10 +30,6 @@ void setup()
 
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
-
-  servoShoulderRightFrontal.attach(9);
-  servoShoulderRightLateral.attach(10);
-  servoElbowRight.attach(11);
 }
 
 void loop()
@@ -41,17 +37,22 @@ void loop()
   if((prev_m1==0) && (curr_m1==1))
   {
     move_home_process=MOVING_TO_HOME_POS;    
-    prev_m1=curr_m1;
-
-    //servoElbowRight.write(SERVOELBOWRIGHT_POS_HOME);
+    prev_m1=curr_m1;    
+    
+    servoElbowRight.attach(11);
+    servoElbowRight.write(SERVOELBOWRIGHT_POS_HOME);
     Serial.println("servoElbowRight");
-    delay(5);
-    //servoShoulderRightLateral_pos.write(SERVOSHOULDERRIGHTLATERAL_POS_HOME);
+    delay(5000);
+
+    servoShoulderRightLateral.attach(10);
+    servoShoulderRightLateral.write(SERVOSHOULDERRIGHTLATERAL_POS_HOME);
     Serial.println("servoShoulderRightLateral_pos");
-    delay(5);
-    //servoShoulderRightFrontal.write(SERVOSHOULDERRIGHTFRONT_POS_HOME);
+    delay(5000);
+
+    servoShoulderRightFrontal.attach(9);
+    servoShoulderRightFrontal.write(SERVOSHOULDERRIGHTFRONT_POS_HOME);
     Serial.println("servoShoulderRightFrontal");
-    delay(5);
+    delay(5000);
 
     move_home_process=MOVED_TO_HOME_POS;
   }
@@ -104,7 +105,7 @@ void receiveEvent(int howMany)
       sscanf(angleStr,"%04d",&angle);
       Serial.print(angle);
     
-      //servoShoulderRightFrontal.write(angle);
+      servoShoulderRightFrontal.write(angle);
       
       //Serial.print(rcmd.substring(3,4));
       Serial.println();
