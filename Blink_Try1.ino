@@ -1,122 +1,116 @@
-/* Sweep
- by BARRAGAN <http://barraganstudio.com>
- This example code is in the public domain.
-
- modified 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Sweep
-*/
-
 #include <Servo.h>
+#include <Wire.h>
 
-Servo servoShoulderLeftLateral;
-Servo servoShoulderLeftFrontal;
-Servo servoElbowLeft;
+#define SERVOSHOULDERRIGHTFRONT_POS_HOME 38
+#define SERVOSHOULDERRIGHTLATERAL_POS_HOME 159
+#define SERVOELBOWRIGHT_POS_HOME 103
 
-int servoShoulderLeftLateral_pos = 38;
-int servoShoulderLeftFrontal_pos = 159;
-int servoElbowLeft_pos = 103;
+#define UNDEFINED 9
+#define MOVING_TO_HOME_POS 0
+#define MOVED_TO_HOME_POS 1
 
-int prev_servoShoulderLeftLateral_pos = 0;
-int prev_servoShoulderLeftFrontal_pos = 0;
-int prev_servoElbowLeft_pos = 0;
+Servo servoShoulderRightFrontal;
+Servo servoShoulderRightLateral;
+Servo servoElbowRight;
 
-char serInput=0;
+int servoShoulderRightFrontal_pos = SERVOSHOULDERRIGHTFRONT_POS_HOME;
+int servoShoulderRightLateral_pos = SERVOSHOULDERRIGHTLATERAL_POS_HOME;
+int servoElbowRight_pos = SERVOELBOWRIGHT_POS_HOME;
+
+int curr_m1=0;
+int prev_m1=0;
+int move_home_process=UNDEFINED;
 
 // create servo object to control a servo
 // twelve servo objects can be created on most boards
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  
-  servoShoulderLeftLateral.attach(9);  // attaches the servo on pin 9 to the servo object
-  servoShoulderLeftFrontal.attach(10);
-  servoElbowLeft.attach(11);
-  
-  servoShoulderLeftLateral.write(servoShoulderLeftLateral_pos);
-  servoShoulderLeftFrontal.write(servoShoulderLeftFrontal_pos);
-  servoElbowLeft.write(servoElbowLeft_pos);
+
+  Wire.begin(8);
+  Wire.onReceive(receiveEvent);
 }
 
 void loop()
 {
-  if (Serial.available() > 0)
+  if((prev_m1==0) && (curr_m1==1))
   {
-    serInput=0;
-    serInput = Serial.read();
+    move_home_process=MOVING_TO_HOME_POS;    
+    prev_m1=curr_m1;    
+    
+    servoElbowRight.attach(11);
+    servoElbowRight.write(SERVOELBOWRIGHT_POS_HOME);
+    Serial.println("servoElbowRight");
+    delay(5000);
 
-    //Serial.print("Received:");
-    //Serial.println(serInput);
+    servoShoulderRightLateral.attach(10);
+    servoShoulderRightLateral.write(SERVOSHOULDERRIGHTLATERAL_POS_HOME);
+    Serial.println("servoShoulderRightLateral_pos");
+    delay(5000);
 
-    if((serInput==97)||(serInput==122)||(serInput==115)||(serInput==120)||(serInput==100)||(serInput==99))
+    servoShoulderRightFrontal.attach(9);
+    servoShoulderRightFrontal.write(SERVOSHOULDERRIGHTFRONT_POS_HOME);
+    Serial.println("servoShoulderRightFrontal");
+    delay(5000);
+
+    move_home_process=MOVED_TO_HOME_POS;
+  }
+}
+
+// function that executes whenever data is received from master
+void receiveEvent(int howMany)
+{
+  String rcmd="";
+
+  char angleStr[4];
+  int angle=0;
+  int m1=0;
+  
+  while (0 <Wire.available())
+  {
+    rcmd += (char)Wire.read();
+  }
+  //Serial.print("Recd Cmd:");
+  //Serial.print(rcmd);
+  //Serial.println();
+
+  if((rcmd[0]=='m') && (rcmd[1]=='1'))
+  {
+    m1=(rcmd.substring(3,4)).toInt();
+    Serial.print("m1=");
+    Serial.print(m1);
+    Serial.println();
+    
+    if(move_home_process!=MOVING_TO_HOME_POS)
     {
-      if(serInput==97)
-      {
-        if(servoShoulderLeftLateral_pos<180)
-        {
-          servoShoulderLeftLateral_pos++;
-        }
-      }
-      else if(serInput==122)
-      {
-        if(servoShoulderLeftLateral_pos>0)
-        {
-          servoShoulderLeftLateral_pos--;
-        }
-      }
-      else if(serInput==115)
-      {
-        if(servoShoulderLeftFrontal_pos<180)
-        {
-          servoShoulderLeftFrontal_pos++;
-        }
-      }
-      else if(serInput==120)
-      {
-        if(servoShoulderLeftFrontal_pos>0)
-        {
-          servoShoulderLeftFrontal_pos--;
-        }
-      }
-      else if(serInput==100)
-      {
-        if(servoElbowLeft_pos<114)
-        {
-          servoElbowLeft_pos++;
-        }
-      }
-      else if(serInput==99)
-      {
-        if(servoElbowLeft_pos>0)
-        {
-          servoElbowLeft_pos--;
-        }
-      }
-
-      Serial.print("servoShoulderLeftLateral_pos:");
-      Serial.print(servoShoulderLeftLateral_pos);
-      Serial.print(" ;servoShoulderLeftFrontal_pos:");
-      Serial.print(servoShoulderLeftFrontal_pos);
-      Serial.print(" ;UservoElbowLeft_pos:");
-      Serial.println(servoElbowLeft_pos);            
-
-      if(prev_servoShoulderLeftLateral_pos!=servoShoulderLeftLateral_pos)
-      {
-        prev_servoShoulderLeftLateral_pos=servoShoulderLeftLateral_pos;
-        servoShoulderLeftLateral.write(servoShoulderLeftLateral_pos);
-      }
-
-      if(prev_servoShoulderLeftFrontal_pos!=servoShoulderLeftFrontal_pos)
-      {
-        prev_servoShoulderLeftFrontal_pos=servoShoulderLeftFrontal_pos;
-        servoShoulderLeftFrontal.write(servoShoulderLeftFrontal_pos);
-      }  
-
-      if(prev_servoElbowLeft_pos!=servoElbowLeft_pos)
-      {
-        prev_servoElbowLeft_pos=servoElbowLeft_pos;
-        servoElbowLeft.write(servoElbowLeft_pos);
-      }  
+      Serial.println("Assigned to curr_m1");
+      curr_m1=m1;      
     }
   }
+  else
+  {
+    if(move_home_process==MOVED_TO_HOME_POS)
+    {    
+      angleStr[0]=rcmd[0];
+      angleStr[1]=rcmd[1];
+      angleStr[2]=rcmd[2];
+      angleStr[3]=rcmd[3];
+    
+      Serial.print("angleStr:");
+      Serial.print(angleStr);
+      Serial.println();  
+    
+      Serial.print("angle:");
+      sscanf(angleStr,"%04d",&angle);
+      Serial.print(angle);
+    
+      servoShoulderRightFrontal.write(angle);
+      
+      //Serial.print(rcmd.substring(3,4));
+      Serial.println();
+    }
+  }
+
+  //
 }
