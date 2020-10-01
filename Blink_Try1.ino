@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include <Wire.h>
+#include "AFMotor.h"
 
 #define SERVOSHOULDERRIGHTFRONT_POS_HOME 38
 #define SERVOSHOULDERRIGHTLATERAL_POS_HOME 159
@@ -21,6 +22,9 @@ int curr_m1=0;
 int prev_m1=0;
 int move_home_process=UNDEFINED;
 
+AF_DCMotor motorLeft(4);
+AF_DCMotor motorRight(3);
+
 // create servo object to control a servo
 // twelve servo objects can be created on most boards
 
@@ -30,6 +34,9 @@ void setup()
 
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+
+  motorLeft.run(RELEASE);
+  motorRight.run(RELEASE);  
 }
 
 void loop()
@@ -66,14 +73,20 @@ void receiveEvent(int howMany)
   char angleStr[4];
   int angle=0;
   int m1=0;
+
+  int leftMotorSpeed=0;
+  int rightMotorSpeed=0;
+
+  int joystick_x=0,joystick_y=0;
+  char joystick_xy[1];
   
   while (0 <Wire.available())
   {
     rcmd += (char)Wire.read();
   }
-  Serial.print("Recd Cmd:");
-  Serial.print(rcmd);
-  Serial.println();
+  //Serial.print("Recd Cmd:");
+  //Serial.print(rcmd);
+  //Serial.println();
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
   {
@@ -87,6 +100,21 @@ void receiveEvent(int howMany)
       Serial.println("Assigned to curr_m1");
       curr_m1=m1;      
     }
+  }
+  else if((rcmd[0]=='j') && (rcmd[1]=='1'))
+  {
+    joystick_xy[0]=rcmd[2];
+    sscanf(joystick_xy,"%01d",&joystick_x);
+    
+    joystick_xy[0]=rcmd[3];
+    sscanf(joystick_xy,"%01d",&joystick_y);
+
+    Serial.print("joystick_x=");
+    Serial.print(joystick_x); 
+
+    Serial.print("joystick_y=");
+    Serial.print(joystick_y);
+    Serial.println(); 
   }
   else
   {
