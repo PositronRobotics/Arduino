@@ -71,9 +71,9 @@ void receiveEvent(int howMany)
   {
     rcmd += (char)Wire.read();
   }
-  //Serial.print("Recd Cmd:");
-  //Serial.print(rcmd);
-  //Serial.println();
+  Serial.print("Recd Cmd:");
+  Serial.print(rcmd);
+  Serial.println();
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
   {
