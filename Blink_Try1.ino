@@ -14,14 +14,28 @@ AF_DCMotor motorLeft(4);
 AF_DCMotor motorRight(3);
 
 int vehicle_state;
+int prev_vehicle_state;
+
 int vehicle_turn_state;
-int vehicle_state_in_transition; 
+int prev_vehicle_turn_state;
+int vehicle_some_state_changed;
 
 int vehicle_leftSpeed=0;
 int vehicle_rightSpeed=0;
 
-// create servo object to control a servo
-// twelve servo objects can be created on most boards
+char vehicle_state_text[3][20] =
+{ 
+  "VEHICLE_STOPPED    ",
+  "VEHICLE_MOVING_FWD ",
+  "VEHICLE_MOVING_BCK ",
+};
+
+char vehicle_turn_state_text[3][20] =
+{ 
+  "VEHICLE_TURN_STRAIT",
+  "VEHICLE_TURN_LEFT  ",
+  "VEHICLE_TURN_RIGHT ",
+};
 
 void setup()
 {
@@ -34,15 +48,26 @@ void setup()
   motorRight.run(RELEASE);
 
   vehicle_state=VEHICLE_STOPPED;
+  prev_vehicle_state=999;
+  
   vehicle_turn_state=VEHICLE_TURN_STRAIGHT;
-  vehicle_state_in_transition=0;
+  prev_vehicle_turn_state=999;
+  
+  vehicle_some_state_changed=0;
 
   Serial.println("check1");
 }
 
 void loop()
 {
-
+  if(vehicle_some_state_changed==1)
+  {
+    Serial.println("------------------");
+    Serial.println(vehicle_state_text[vehicle_state]);
+    Serial.println(vehicle_turn_state_text[vehicle_turn_state]);
+    
+    vehicle_some_state_changed=0;
+  }
 }
 
 // function that executes whenever data is received from master
@@ -56,14 +81,15 @@ void receiveEvent(int howMany)
 
   int joystick_x=0,joystick_y=0;
   char joystick_xy[1];
+  static int prev_vehicle_turn_state=999;
   
   while (0 <Wire.available())
   {
     rcmd += (char)Wire.read();
   }
-  Serial.print("Recd Cmd:");
-  Serial.print(rcmd);
-  Serial.println();
+  //Serial.print("Recd Cmd:");
+  //Serial.print(rcmd);
+  //Serial.println();
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
   {
@@ -74,7 +100,7 @@ void receiveEvent(int howMany)
   }
   else if((rcmd[0]=='j') && (rcmd[1]=='1'))
   {
-    if(vehicle_state_in_transition==0)
+    if(vehicle_some_state_changed==0)
     {
       joystick_xy[0]=rcmd[2];
       sscanf(joystick_xy,"%01d",&joystick_x);
@@ -82,18 +108,14 @@ void receiveEvent(int howMany)
       joystick_xy[0]=rcmd[3];
       sscanf(joystick_xy,"%01d",&joystick_y);
   
-      Serial.print("joystick_x=");
-      Serial.print(joystick_x); 
+      //Serial.print("joystick_x=");
+      //Serial.print(joystick_x); 
   
-      Serial.print("joystick_y=");
-      Serial.print(joystick_y);
-      Serial.println();
+      //Serial.print("joystick_y=");
+      //Serial.print(joystick_y);
+      //Serial.println();
   
-      if((joystick_x>=3) || (joystick_x<=7))
-      {
-        vehicle_turn_state=VEHICLE_TURN_STRAIGHT;
-      }
-      else if(joystick_x<3)
+      if(joystick_x<3)
       {
         vehicle_turn_state=VEHICLE_TURN_LEFT;
       }
@@ -101,10 +123,35 @@ void receiveEvent(int howMany)
       {
         vehicle_turn_state=VEHICLE_TURN_RIGHT;
       }
+      else
+      {
+        vehicle_turn_state=VEHICLE_TURN_STRAIGHT;
+      }
 
-      //if(joystick_y>=5
-  
-      //vehicle_state_in_transition=1;
+      if(joystick_y>=7)
+      {
+        vehicle_state=VEHICLE_MOVING_FWD;
+      }
+      else if(joystick_y<=3)
+      {
+        vehicle_state=VEHICLE_MOVING_BCK;
+      }
+      else
+      {
+        vehicle_state=VEHICLE_STOPPED;
+      }
+
+      if(prev_vehicle_state!=vehicle_state)
+      {
+        prev_vehicle_state=vehicle_state;
+        vehicle_some_state_changed=1;
+      }
+
+      if(prev_vehicle_turn_state!=vehicle_turn_state)
+      {
+        prev_vehicle_turn_state=vehicle_turn_state;
+        vehicle_some_state_changed=1;
+      }
     }
   }
   else
