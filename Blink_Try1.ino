@@ -10,6 +10,9 @@
 #define VEHICLE_TURN_LEFT 1
 #define VEHICLE_TURN_RIGHT 2
 
+#define WHEEL_SPEED_HIGH 255
+#define WHEEL_SPEED_LOW 220
+
 AF_DCMotor motorLeft(4);
 AF_DCMotor motorRight(3);
 
@@ -56,9 +59,42 @@ void setup()
   vehicle_some_state_changed=0;
 
   Serial.println("check1");
+
+  /*motorLeft.setSpeed(255); 
+  motorLeft.run(RELEASE);
+  motorRight.setSpeed(255); 
+  motorRight.run(RELEASE);*/
 }
 
 void loop()
+{
+  changeDCmotorConfigs();
+
+    /*while(1)
+    {
+      Serial.println("FWD");   
+      motorLeft.run(FORWARD);
+      motorRight.run(BACKWARD);
+      delay(4000);
+
+      Serial.println("STOPPED");
+      motorLeft.run(RELEASE);
+      motorRight.run(RELEASE);
+      delay(4000);
+
+      Serial.println("BACK");   
+      motorLeft.run(BACKWARD);
+      motorRight.run(FORWARD);
+      delay(4000);
+
+      Serial.println("STOPPED");
+      motorLeft.run(RELEASE);
+      motorRight.run(RELEASE);
+      delay(4000);            
+    } */ 
+}
+
+void changeDCmotorConfigs(void)
 {
   if(vehicle_some_state_changed==1)
   {
@@ -67,6 +103,38 @@ void loop()
     Serial.println(vehicle_turn_state_text[vehicle_turn_state]);
     
     vehicle_some_state_changed=0;
+  }
+
+  if(vehicle_turn_state==VEHICLE_TURN_STRAIGHT)
+  {
+    motorLeft.setSpeed(WHEEL_SPEED_HIGH);
+    motorRight.setSpeed(WHEEL_SPEED_HIGH);
+  }
+  else if(vehicle_turn_state==VEHICLE_TURN_LEFT)
+  {
+    motorLeft.setSpeed(WHEEL_SPEED_LOW);
+    motorRight.setSpeed(WHEEL_SPEED_HIGH);
+  }
+  else if(vehicle_turn_state==VEHICLE_TURN_RIGHT)
+  {
+    motorLeft.setSpeed(WHEEL_SPEED_HIGH);
+    motorRight.setSpeed(WHEEL_SPEED_LOW);
+  }  
+
+  if(vehicle_state==VEHICLE_MOVING_FWD)
+  {
+    motorLeft.run(FORWARD);
+    motorRight.run(FORWARD);
+  }
+  else if(vehicle_state==VEHICLE_MOVING_BCK)
+  {
+    motorLeft.run(BACKWARD);
+    motorRight.run(BACKWARD);
+  }
+  else
+  {
+    motorLeft.run(RELEASE);
+    motorRight.run(RELEASE);
   }
 }
 
