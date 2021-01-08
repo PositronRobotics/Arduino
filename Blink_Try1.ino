@@ -13,8 +13,8 @@
 #define WHEEL_SPEED_HIGH 255
 #define WHEEL_SPEED_LOW 220
 
-AF_DCMotor motorLeft(4);
-AF_DCMotor motorRight(3);
+AF_DCMotor motorLeft(3);
+AF_DCMotor motorRight(4);
 
 int vehicle_state;
 int prev_vehicle_state;
@@ -155,9 +155,9 @@ void receiveEvent(int howMany)
   {
     rcmd += (char)Wire.read();
   }
-  //Serial.print("Recd Cmd:");
-  //Serial.print(rcmd);
-  //Serial.println();
+  Serial.print("Recd Cmd:");
+  Serial.print(rcmd);
+  Serial.println();
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
   {
