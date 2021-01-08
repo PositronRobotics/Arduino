@@ -16,6 +16,8 @@
 AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
 
+Servo servoNeckAzimuth;
+
 int vehicle_state;
 int prev_vehicle_state;
 
@@ -50,6 +52,8 @@ void setup()
   motorLeft.run(RELEASE);
   motorRight.run(RELEASE);
 
+  servoNeckAzimuth.attach(9);
+
   vehicle_state=VEHICLE_STOPPED;
   prev_vehicle_state=999;
   
@@ -59,39 +63,11 @@ void setup()
   vehicle_some_state_changed=0;
 
   Serial.println("check1");
-
-  /*motorLeft.setSpeed(255); 
-  motorLeft.run(RELEASE);
-  motorRight.setSpeed(255); 
-  motorRight.run(RELEASE);*/
 }
 
 void loop()
 {
   changeDCmotorConfigs();
-
-    /*while(1)
-    {
-      Serial.println("FWD");   
-      motorLeft.run(FORWARD);
-      motorRight.run(BACKWARD);
-      delay(4000);
-
-      Serial.println("STOPPED");
-      motorLeft.run(RELEASE);
-      motorRight.run(RELEASE);
-      delay(4000);
-
-      Serial.println("BACK");   
-      motorLeft.run(BACKWARD);
-      motorRight.run(FORWARD);
-      delay(4000);
-
-      Serial.println("STOPPED");
-      motorLeft.run(RELEASE);
-      motorRight.run(RELEASE);
-      delay(4000);            
-    } */ 
 }
 
 void changeDCmotorConfigs(void)
@@ -237,7 +213,7 @@ void receiveEvent(int howMany)
      sscanf(angleStr,"%04d",&angle);
      Serial.print(angle);
     
-     //servoShoulderRightFrontal.write(angle);
+     servoNeckAzimuth.write(angle);
       
      //Serial.print(rcmd.substring(3,4));
      Serial.println();
