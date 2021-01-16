@@ -17,6 +17,7 @@ AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
 
 Servo servoNeckAzimuth;
+Servo servoNeckElevation;
 
 int vehicle_state;
 int prev_vehicle_state;
@@ -53,6 +54,7 @@ void setup()
   motorRight.run(RELEASE);
 
   servoNeckAzimuth.attach(9);
+  servoNeckElevation.attach(10);
 
   vehicle_state=VEHICLE_STOPPED;
   prev_vehicle_state=999;
@@ -123,9 +125,12 @@ void receiveEvent(int howMany)
   int angle=0;
   int m1=0;
 
-  int joystick_x=0,joystick_y=0;
-  char joystick_xy[1];
+  int joystick_x_vehicle=0,joystick_y_vehicle=0;
+  char joystick_xy_vehicle[1];
   static int prev_vehicle_turn_state=999;
+
+  int joystick_x_head=0,joystick_y_head=0;
+  char joystick_xy_head[1];  
   
   while (0 <Wire.available())
   {
@@ -146,24 +151,24 @@ void receiveEvent(int howMany)
   {
     if(vehicle_some_state_changed==0)
     {
-      joystick_xy[0]=rcmd[2];
-      sscanf(joystick_xy,"%01d",&joystick_x);
+      joystick_xy_vehicle[0]=rcmd[2];
+      sscanf(joystick_xy_vehicle,"%01d",&joystick_x_vehicle);
       
-      joystick_xy[0]=rcmd[3];
-      sscanf(joystick_xy,"%01d",&joystick_y);
+      joystick_xy_vehicle[0]=rcmd[3];
+      sscanf(joystick_xy_vehicle,"%01d",&joystick_y_vehicle);
   
-      //Serial.print("joystick_x=");
-      //Serial.print(joystick_x); 
+      Serial.print("joystick_x_vehicle=");
+      Serial.print(joystick_x_vehicle); 
   
-      //Serial.print("joystick_y=");
-      //Serial.print(joystick_y);
-      //Serial.println();
+      Serial.print("joystick_y_vehicle=");
+      Serial.print(joystick_y_vehicle);
+      Serial.println();
   
-      if(joystick_x<3)
+      if(joystick_x_vehicle<3)
       {
         vehicle_turn_state=VEHICLE_TURN_LEFT;
       }
-      else if(joystick_x>7)
+      else if(joystick_x_vehicle>7)
       {
         vehicle_turn_state=VEHICLE_TURN_RIGHT;
       }
@@ -172,11 +177,11 @@ void receiveEvent(int howMany)
         vehicle_turn_state=VEHICLE_TURN_STRAIGHT;
       }
 
-      if(joystick_y>=7)
+      if(joystick_y_vehicle>=7)
       {
         vehicle_state=VEHICLE_MOVING_FWD;
       }
-      else if(joystick_y<=3)
+      else if(joystick_y_vehicle<=3)
       {
         vehicle_state=VEHICLE_MOVING_BCK;
       }
@@ -198,26 +203,22 @@ void receiveEvent(int howMany)
       }
     }
   }
-  else
-  {   
-     angleStr[0]=rcmd[0];
-     angleStr[1]=rcmd[1];
-     angleStr[2]=rcmd[2];
-     angleStr[3]=rcmd[3];
-    
-     Serial.print("angleStr:");
-     Serial.print(angleStr);
-     Serial.println();  
-    
-     Serial.print("angle:");
-     sscanf(angleStr,"%04d",&angle);
-     Serial.print(angle);
-    
-     servoNeckAzimuth.write(angle);
+  else if((rcmd[0]=='j') && (rcmd[1]=='2'))
+  {
+      joystick_xy_head[0]=rcmd[2];
+      sscanf(joystick_xy_head,"%01d",&joystick_x_head);
       
-     //Serial.print(rcmd.substring(3,4));
-     Serial.println();
-  }
+      joystick_xy_head[0]=rcmd[3];
+      sscanf(joystick_xy_head,"%01d",&joystick_y_head);
+  
+      Serial.print("joystick_x_head=");
+      Serial.print(joystick_x_head*20); 
+  
+      Serial.print("joystick_y_head=");
+      Serial.print(joystick_y_head*20);
+      Serial.println();
 
-  //
+      servoNeckAzimuth.write(joystick_x_head*20);
+      servoNeckElevation.write(joystick_y_head*20);
+  }
 }
