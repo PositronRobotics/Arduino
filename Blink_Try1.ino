@@ -130,7 +130,7 @@ void receiveEvent(int howMany)
   static int prev_vehicle_turn_state=999;
 
   int joystick_x_head=0,joystick_y_head=0;
-  char joystick_xy_head[1];  
+  char joystick_xy_head[3];  
   
   while (0 <Wire.available())
   {
@@ -206,19 +206,23 @@ void receiveEvent(int howMany)
   else if((rcmd[0]=='j') && (rcmd[1]=='2'))
   {
       joystick_xy_head[0]=rcmd[2];
-      sscanf(joystick_xy_head,"%01d",&joystick_x_head);
+      joystick_xy_head[1]=rcmd[3];
+      joystick_xy_head[2]=rcmd[4];
+      sscanf(joystick_xy_head,"%03d",&joystick_x_head);
       
-      joystick_xy_head[0]=rcmd[3];
-      sscanf(joystick_xy_head,"%01d",&joystick_y_head);
+      joystick_xy_head[0]=rcmd[5];
+      joystick_xy_head[1]=rcmd[6];
+      joystick_xy_head[2]=rcmd[7];
+      sscanf(joystick_xy_head,"%03d",&joystick_y_head);
   
       Serial.print("joystick_x_head=");
-      Serial.print(joystick_x_head*20); 
+      Serial.print(joystick_x_head); 
   
       Serial.print("joystick_y_head=");
-      Serial.print(joystick_y_head*20);
+      Serial.print(joystick_y_head);
       Serial.println();
 
-      servoNeckAzimuth.write(joystick_x_head*20);
-      servoNeckElevation.write(joystick_y_head*20);
+      servoNeckAzimuth.write(joystick_x_head);
+      servoNeckElevation.write(joystick_y_head);
   }
 }
