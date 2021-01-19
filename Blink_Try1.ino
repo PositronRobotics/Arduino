@@ -131,6 +131,9 @@ void receiveEvent(int howMany)
 
   int joystick_x_head=0,joystick_y_head=0;
   char joystick_xy_head[3];  
+
+  int ArmServoPos=0;
+  char ArmServoPos_str[3];   
   
   while (0 <Wire.available())
   {
@@ -225,4 +228,18 @@ void receiveEvent(int howMany)
       servoNeckAzimuth.write(joystick_x_head);
       servoNeckElevation.write(joystick_y_head);
   }
+  else if((rcmd[0]=='R') && (rcmd[1]=='S') && (rcmd[2]=='F'))
+  {
+      ArmServoPos_str[0]=rcmd[3];
+      ArmServoPos_str[1]=rcmd[4];
+      ArmServoPos_str[2]=rcmd[5];
+      sscanf(ArmServoPos_str,"%03d",&ArmServoPos);
+  
+      Serial.print("ArmServoPos=");
+      Serial.print(ArmServoPos); 
+      Serial.println();
+
+      //servoNeckAzimuth.write(joystick_x_head);
+      //servoNeckElevation.write(joystick_y_head);
+  }  
 }
