@@ -19,6 +19,8 @@ AF_DCMotor motorRight(4);
 Servo servoNeckAzimuth;
 Servo servoNeckElevation;
 
+Servo ArmRSF;
+
 int vehicle_state;
 int prev_vehicle_state;
 
@@ -55,6 +57,8 @@ void setup()
 
   servoNeckAzimuth.attach(9);
   servoNeckElevation.attach(10);
+
+  ArmRSF.attach(11);
 
   vehicle_state=VEHICLE_STOPPED;
   prev_vehicle_state=999;
@@ -239,7 +243,6 @@ void receiveEvent(int howMany)
       Serial.print(ArmServoPos); 
       Serial.println();
 
-      //servoNeckAzimuth.write(joystick_x_head);
-      //servoNeckElevation.write(joystick_y_head);
+      ArmRSF.write(ArmServoPos);
   }  
 }
