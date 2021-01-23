@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include <Wire.h>
+#include "AFMotor.h"
 
 #define SERVOSHOULDERRIGHTFRONT_POS_HOME 38
 #define servo10_POS_HOME 159
@@ -11,6 +12,11 @@ Servo servo11;
 Servo servo13;
 Servo servo2;
 
+#define WHEEL_SPEED_HIGH 255
+
+AF_DCMotor motorLeft(3);
+AF_DCMotor motorRight(4);
+
 int servo9_pos = 0;
 int servo10_pos = 0;
 int servo11_pos = 0;
@@ -20,6 +26,8 @@ int m1=1;
 long driveMotorctr=0;
 
 char serInput=0;
+
+int wheelsDir=0;
 
 // create servo object to control a servo
 // twelve servo objects can be created on most boards
@@ -35,6 +43,12 @@ void setup() {
   servo11.attach(11);
   servo13.attach(13);
   servo2.attach(2);
+
+  motorLeft.run(RELEASE);
+  motorRight.run(RELEASE);
+
+  motorLeft.setSpeed(WHEEL_SPEED_HIGH);
+  motorRight.setSpeed(WHEEL_SPEED_HIGH);    
 }
 
 void loop()
@@ -88,6 +102,19 @@ void loop()
       Serial.print("servo9_pos:");
       Serial.print(servo9_pos);
       Serial.println();
+
+      if(servo9_pos==0)
+      {
+        motorLeft.run(FORWARD);
+        motorRight.run(FORWARD);        
+        wheelsDir=1;      
+      }
+      else if(servo9_pos==180)
+      {
+        motorLeft.run(BACKWARD);
+        motorRight.run(BACKWARD);        
+        wheelsDir=0;        
+      }
     }
   }
 }
