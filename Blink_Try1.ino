@@ -11,6 +11,7 @@ Servo servo10;
 Servo servo11;
 Servo servo13;
 Servo servo2;
+Servo servo3;
 
 #define WHEEL_SPEED_HIGH 255
 
@@ -43,6 +44,7 @@ void setup() {
   servo11.attach(11);
   servo13.attach(13);
   servo2.attach(2);
+  servo3.attach(3);
 
   motorLeft.run(RELEASE);
   motorRight.run(RELEASE);
@@ -98,6 +100,7 @@ void loop()
       servo11.write(servo9_pos);
       servo13.write(servo9_pos);
       servo2.write(servo9_pos);
+      servo3.write(servo9_pos);
         
       Serial.print("servo9_pos:");
       Serial.print(servo9_pos);
