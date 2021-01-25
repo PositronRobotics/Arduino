@@ -2,29 +2,26 @@
 #include <Wire.h>
 #include "AFMotor.h"
 
-#define SERVOSHOULDERRIGHTFRONT_POS_HOME 38
-#define servo10_POS_HOME 159
-#define SERVOELBOWRIGHT 103
+#define ARM_RSF_POS_HOME 38
+#define ARM_RSL_POS_HOME 159
+#define ARM_REL_POS_HOME 103
 
-Servo servo9;
-Servo servo10;
-Servo servo11;
-Servo servo13;
-Servo servo2;
-Servo servo3;
+#define UNDEFINED 9
+#define MOVING_TO_HOME_POS 0
+#define MOVED_TO_HOME_POS 1
 
 #define WHEEL_SPEED_HIGH 255
+
+Servo arm_RSF;
+Servo arm_RSL;
+Servo arm_REL;
 
 AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
 
-int servo9_pos = 0;
-int servo10_pos = 0;
-int servo11_pos = 0;
-
-int zeroTo180=1;
-int m1=1;
-long driveMotorctr=0;
+int curr_m1=0;
+int prev_m1=0;
+int move_home_process=UNDEFINED;
 
 char serInput=0;
 
@@ -39,13 +36,6 @@ void setup() {
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
 
-  servo9.attach(9);
-  servo10.attach(10);
-  servo11.attach(11);
-  servo13.attach(13);
-  servo2.attach(2);
-  servo3.attach(3);
-
   motorLeft.run(RELEASE);
   motorRight.run(RELEASE);
 
@@ -55,70 +45,27 @@ void setup() {
 
 void loop()
 {
-
-  //Serial.println("Starting...");
-  
-  if(m1==0)
+  if((prev_m1==0) && (curr_m1==1))
   {
-    Serial.print("M1 Off");
-    Serial.println();
-  }
-  else
-  {
-    //Serial.print("M1 On");
-    //Serial.println();
+    move_home_process=MOVING_TO_HOME_POS;    
+    prev_m1=curr_m1;    
+    
+    arm_REL.attach(11);
+    arm_REL.write(ARM_REL_POS_HOME);
+    Serial.println("arm_REL");
+    delay(5000);
 
-    if(driveMotorctr++>=6000)
-    {
-      driveMotorctr=0;
-  
-      if(zeroTo180==1)
-      {
-        if(servo9_pos<180)
-        {
-          servo9_pos++; 
-        }
-        else if(servo9_pos==180)
-        {
-          zeroTo180=0;
-        }
-      }
-      else
-      {
-        if(servo9_pos>0)
-        {
-          servo9_pos--;
-        }
-        else if(servo9_pos==0)
-        {
-          zeroTo180=1;
-        }
-      }
-      
-      servo9.write(servo9_pos);
-      servo10.write(servo9_pos);
-      servo11.write(servo9_pos);
-      servo13.write(servo9_pos);
-      servo2.write(servo9_pos);
-      servo3.write(servo9_pos);
-        
-      Serial.print("servo9_pos:");
-      Serial.print(servo9_pos);
-      Serial.println();
+    arm_RSL.attach(10);
+    arm_RSL.write(ARM_RSL_POS_HOME);
+    Serial.println("arm_RSL");
+    delay(5000);
 
-      if(servo9_pos==0)
-      {
-        motorLeft.run(FORWARD);
-        motorRight.run(FORWARD);        
-        wheelsDir=1;      
-      }
-      else if(servo9_pos==180)
-      {
-        motorLeft.run(BACKWARD);
-        motorRight.run(BACKWARD);        
-        wheelsDir=0;        
-      }
-    }
+    arm_RSF.attach(9);
+    arm_RSF.write(ARM_RSF_POS_HOME);
+    Serial.println("arm_RSF");
+    delay(5000);
+
+    move_home_process=MOVED_TO_HOME_POS;
   }
 }
 
@@ -126,6 +73,8 @@ void loop()
 void receiveEvent(int howMany)
 {
   String rcmd = "";
+
+  int m1=0;
   
   while (0 <Wire.available())
   {
@@ -137,5 +86,14 @@ void receiveEvent(int howMany)
   //Serial.print(rcmd.substring(3,4));
   //Serial.println();             /* to newline */
 
-  m1=(rcmd.substring(3,4)).toInt();
+  if((rcmd[0]=='m') && (rcmd[1]=='1'))
+  {
+    m1=(rcmd.substring(3,4)).toInt();
+    
+    if(move_home_process!=MOVING_TO_HOME_POS)
+    {
+      Serial.println("Assigned to curr_m1");
+      curr_m1=m1;      
+    }    
+  }
 }
