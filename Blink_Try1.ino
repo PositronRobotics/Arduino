@@ -45,6 +45,8 @@ void setup() {
 
 void loop()
 {
+  //Serial.println("in LOOP");
+  
   if((prev_m1==0) && (curr_m1==1))
   {
     move_home_process=MOVING_TO_HOME_POS;    
@@ -82,9 +84,9 @@ void receiveEvent(int howMany)
     //Serial.print(c);           /* print the character */
     rcmd += (char)Wire.read();
   }
-  //Serial.print("Recd Cmd:");
-  //Serial.print(rcmd.substring(3,4));
-  //Serial.println();             /* to newline */
+  Serial.print("Recd Cmd:");
+  Serial.print(rcmd.substring(3,4));
+  Serial.println();             /* to newline */
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
   {
