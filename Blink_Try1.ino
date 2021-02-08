@@ -2,9 +2,15 @@
 #include <Wire.h>
 #include "AFMotor.h"
 
+#define NOOFSERVOSARMED 3
+
 #define ARM_RSF_POS_HOME 38
 #define ARM_RSL_POS_HOME 159
 #define ARM_REL_POS_HOME 103
+
+#define ARM_RSF_PIN 9
+#define ARM_RSL_PIN 10
+#define ARM_REL_PIN 11
 
 #define UNDEFINED 9
 #define MOVING_TO_HOME_POS 0
@@ -12,20 +18,40 @@
 
 #define WHEEL_SPEED_HIGH 255
 
-Servo arm_RSF;
-Servo arm_RSL;
-Servo arm_REL;
+#define UNDEFINED 999
+
+enum ArmServoEnum{RSF,RSL,REL};
+
+struct sservoConstData
+{
+  int pin;
+  int initialPos;
+  int initOrder;
+};
+
+struct sservoConstData servoConstData[NOOFSERVOSARMED]=
+{
+  {ARM_RSF_PIN,ARM_RSF_POS_HOME,2},
+  {ARM_RSL_PIN,ARM_RSL_POS_HOME,1},
+  {ARM_REL_PIN,ARM_REL_POS_HOME,0},    
+};
+
+Servo servoHW[3];
+
+struct sservoCurrData
+{
+  int prev;
+  int curr;
+};
+
+struct sservoCurrData servoCurrData[3];
+
+//Temp for Control from Blynk
+int servo_control_flag[3]={0,0,0};
+int currServo=UNDEFINED;
 
 AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
-
-int arm_RSF_pos;
-int arm_RSL_pos;
-int arm_REL_pos;
-
-int prev_arm_RSF_pos = 0;
-int prev_arm_RSL_pos = 0;
-int prev_arm_REL_pos = 0;
 
 int curr_m1=0;
 int prev_m1=0;
@@ -35,10 +61,8 @@ char serInput=0;
 
 int wheelsDir=0;
 
-// create servo object to control a servo
-// twelve servo objects can be created on most boards
-
-void setup() {
+void setup()
+{ 
   Serial.begin(115200);
 
   Wire.begin(8);
@@ -49,11 +73,14 @@ void setup() {
   motorRight.run(RELEASE);
 
   motorLeft.setSpeed(WHEEL_SPEED_HIGH);
-  motorRight.setSpeed(WHEEL_SPEED_HIGH);
+  motorRight.setSpeed(WHEEL_SPEED_HIGH);  
 
-  arm_RSF_pos=ARM_RSF_POS_HOME;
-  arm_RSL_pos=ARM_RSL_POS_HOME;  
-  arm_REL_pos=ARM_REL_POS_HOME;
+  for(int i=0;i<NOOFSERVOSARMED;i++)
+  {    
+    servoCurrData[i].prev=999;
+    servoCurrData[i].curr=servoConstData[i].initialPos;    
+    //Serial.println("test102");
+  }
 }
 
 void loop()
@@ -62,10 +89,12 @@ void loop()
   
   if((prev_m1==0) && (curr_m1==1))
   {
+    Serial.println("inside If");
+    
     move_home_process=MOVING_TO_HOME_POS;    
     prev_m1=curr_m1;    
     
-    arm_REL.attach(11);
+    /*arm_REL.attach(11);
     arm_REL.write(arm_REL_pos);
     Serial.println("arm_REL");
     delay(5000);
@@ -78,10 +107,33 @@ void loop()
     arm_RSF.attach(9);
     arm_RSF.write(arm_RSF_pos);
     Serial.println("arm_RSF");
-    delay(5000);
+    delay(5000);*/
+
+    for(int initCtr=0;initCtr<NOOFSERVOSARMED;initCtr++)
+    {
+      Serial.println("initCtr loop");
+      for(int j=0;j<NOOFSERVOSARMED;j++)
+      {
+        Serial.println("j loop");
+        if(initCtr==servoConstData[j].initOrder)
+        {
+          Serial.println("if condn");
+          //servoHW[j].attach(servoConstData[j].pin);
+          //servoHW[j].write(servoConstData[j].InitialPos);
+
+          /*char values[25];
+          sprintf(values,"Servo[%d].attach[%d]",j,servoConstData[j].pin);
+          Serial.println(values);
+          sprintf(values,"Servo[%d].write[%d]",j,servoConstData[j].initialPos);
+          Serial.println(values);       */   
+        }
+      }
+    }
 
     move_home_process=MOVED_TO_HOME_POS;
   }
+
+  //if(
 }
 
 // function that executes whenever data is received from master
@@ -103,22 +155,37 @@ void receiveEvent(int howMany)
   Serial.println();             /* to newline */
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
-  {
-    m1=(rcmd.substring(3,4)).toInt();
-    
+  {  
     if(move_home_process!=MOVING_TO_HOME_POS)
     {
       Serial.println("Assigned to curr_m1");
-      curr_m1=m1;      
+      curr_m1=1;      
     }    
   }
+  
+  /*if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[f]=='f'))
+  {
+    currServo=RSF;
+  }
+  else if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[f]=='l'))
+  {
+    currServo=RSL;
+  }
+  else if((rcmd[0]=='r') && (rcmd[1]=='e') && (rcmd[f]=='l'))
+  {
+    currServo=REL;
+  }
+  else if((rcmd[0]=='V') && (rcmd[1]=='2'))
+  {
+    
+  }*/
 }
 
 void requestEvent()
 {
   char values[25];
-  sprintf(values,"AR:RSF:%03d,RSL:%03d,REL:%03d",arm_RSF_pos,arm_RSL_pos,arm_REL_pos);
-  Serial.println(values); 
+  sprintf(values,"AR:RSF:%03d,RSL:%03d,REL:%03d",servoCurrData[0].curr,servoCurrData[1].curr,servoCurrData[REL].curr);
+  //Serial.println(values); 
   Wire.write(values);
 }
 
