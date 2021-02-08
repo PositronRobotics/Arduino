@@ -19,6 +19,14 @@ Servo arm_REL;
 AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
 
+int arm_RSF_pos;
+int arm_RSL_pos;
+int arm_REL_pos;
+
+int prev_arm_RSF_pos = 0;
+int prev_arm_RSL_pos = 0;
+int prev_arm_REL_pos = 0;
+
 int curr_m1=0;
 int prev_m1=0;
 int move_home_process=UNDEFINED;
@@ -35,12 +43,17 @@ void setup() {
 
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
 
   motorLeft.run(RELEASE);
   motorRight.run(RELEASE);
 
   motorLeft.setSpeed(WHEEL_SPEED_HIGH);
-  motorRight.setSpeed(WHEEL_SPEED_HIGH);    
+  motorRight.setSpeed(WHEEL_SPEED_HIGH);
+
+  arm_RSF_pos=ARM_RSF_POS_HOME;
+  arm_RSL_pos=ARM_RSL_POS_HOME;  
+  arm_REL_pos=ARM_REL_POS_HOME;
 }
 
 void loop()
@@ -53,17 +66,17 @@ void loop()
     prev_m1=curr_m1;    
     
     arm_REL.attach(11);
-    arm_REL.write(ARM_REL_POS_HOME);
+    arm_REL.write(arm_REL_pos);
     Serial.println("arm_REL");
     delay(5000);
 
     arm_RSL.attach(10);
-    arm_RSL.write(ARM_RSL_POS_HOME);
+    arm_RSL.write(arm_RSL_pos);
     Serial.println("arm_RSL");
     delay(5000);
 
     arm_RSF.attach(9);
-    arm_RSF.write(ARM_RSF_POS_HOME);
+    arm_RSF.write(arm_RSF_pos);
     Serial.println("arm_RSF");
     delay(5000);
 
@@ -85,7 +98,8 @@ void receiveEvent(int howMany)
     rcmd += (char)Wire.read();
   }
   Serial.print("Recd Cmd:");
-  Serial.print(rcmd.substring(3,4));
+  Serial.print(rcmd);
+  //Serial.print(rcmd.substring(3,4));
   Serial.println();             /* to newline */
 
   if((rcmd[0]=='m') && (rcmd[1]=='1'))
@@ -99,3 +113,82 @@ void receiveEvent(int howMany)
     }    
   }
 }
+
+void requestEvent()
+{
+  char values[25];
+  sprintf(values,"AR:RSF:%03d,RSL:%03d,REL:%03d",arm_RSF_pos,arm_RSL_pos,arm_REL_pos);
+  Serial.println(values); 
+  Wire.write(values);
+}
+
+/*void UpdateServos(void)
+{
+  if(serInput==97)
+  {
+    if(arm_RSL_pos<180)
+    {
+      arm_RSL_pos++;
+    }
+  }
+  else if(serInput==122)
+  {
+    if(arm_RSL_pos>0)
+    {
+      arm_RSL_pos--;
+    }
+  }
+  else if(serInput==115)
+  {
+    if(arm_RSF_pos<180)
+    {
+      arm_RSF_pos++;
+    }
+  }
+  else if(serInput==120)
+  {
+    if(arm_RSF_pos>0)
+    {
+      arm_RSF_pos--;
+    }
+  }
+  else if(serInput==100)
+  {
+    if(arm_REL_pos<114)
+    {
+      arm_REL_pos++;
+    }
+  }
+  else if(serInput==99)
+  {
+    if(arm_REL_pos>0)
+    {
+      arm_REL_pos--;
+    }
+  }
+  
+  Serial.print("arm_RSL_pos:");
+  Serial.print(arm_RSL_pos);
+  Serial.print(" ;arm_RSF_pos:");
+  Serial.print(arm_RSF_pos);
+  Serial.print(" ;Uarm_REL_pos:");
+  Serial.println(arm_REL_pos);            
+  
+  if(prev_arm_RSL_pos!=arm_RSL_pos)
+  {
+    prev_arm_RSL_pos=arm_RSL_pos;
+    RSL.write(arm_RSL_pos);
+  }
+  
+  if(prev_arm_RSF_pos!=arm_RSF_pos)
+  {
+    prev_arm_RSF_pos=arm_RSF_pos;
+    servoShoulderLeftFrontal.write(arm_RSF_pos);
+  }  
+  
+  if(prev_arm_REL_pos!=arm_REL_pos)
+  {
+    prev_arm_REL_pos=arm_REL_pos;
+    servoElbowLeft.write(arm_REL_pos);
+  }
+}*/
