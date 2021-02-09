@@ -61,6 +61,9 @@ char serInput=0;
 
 int wheelsDir=0;
 
+void receiveEvent(int howMany);
+void requestEvent();
+
 void setup()
 { 
   Serial.begin(115200);
@@ -85,6 +88,7 @@ void setup()
 
 void loop()
 {
+  char values[25];
   //Serial.println("in LOOP");
   
   if((prev_m1==0) && (curr_m1==1))
@@ -111,21 +115,35 @@ void loop()
 
     for(int initCtr=0;initCtr<NOOFSERVOSARMED;initCtr++)
     {
-      Serial.println("initCtr loop");
+      //Serial.print("initCtr loop:");
+      //Serial.println(initCtr);
+      
       for(int j=0;j<NOOFSERVOSARMED;j++)
       {
-        Serial.println("j loop");
+        //Serial.print("j loop:");
+        //Serial.println(j);
+        //Serial.print("servoConstData[j].initOrder:");
+        //Serial.println(servoConstData[j].initOrder);
+                
         if(initCtr==servoConstData[j].initOrder)
         {
-          Serial.println("if condn");
+          //Serial.println("if condn");
           //servoHW[j].attach(servoConstData[j].pin);
           //servoHW[j].write(servoConstData[j].InitialPos);
+          
+          //sprintf(values,"Servo[%d].attach[%d]",j,servoConstData[j].pin);
+          //Serial.println(values);
+          //sprintf(values,"Servo[%d].write[%d]",j,servoConstData[j].initialPos);
+          //Serial.println(values);
 
-          /*char values[25];
-          sprintf(values,"Servo[%d].attach[%d]",j,servoConstData[j].pin);
-          Serial.println(values);
-          sprintf(values,"Servo[%d].write[%d]",j,servoConstData[j].initialPos);
-          Serial.println(values);       */   
+          Serial.print("Servo:");
+          Serial.print(j);
+          Serial.print(", servoConstData[j].initialPos:");
+          Serial.print(servoConstData[j].initialPos);
+          Serial.print(", servoConstData[j].pin:");
+          Serial.println(servoConstData[j].pin);                    
+
+          break;
         }
       }
     }
