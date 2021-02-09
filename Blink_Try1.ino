@@ -49,6 +49,7 @@ struct sservoCurrData servoCurrData[3];
 //Temp for Control from Blynk
 int servo_control_flag=0;
 int currServo=UNDEFINED;
+int changeCtr=0;
 
 AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
@@ -56,8 +57,6 @@ AF_DCMotor motorRight(4);
 int curr_m1=0;
 int prev_m1=0;
 int move_home_process=UNDEFINED;
-
-char serInput=0;
 
 int wheelsDir=0;
 
@@ -132,21 +131,23 @@ void loop()
   }
   else if(move_home_process==MOVED_TO_HOME_POS)
   {
-    //Serial.print("servo_control_flag:");
-    //Serial.println(servo_control_flag);
-    
-    if(servo_control_flag==1)
-    {
-      if(servoCurrData[currServo].curr<180)
+    if(changeCtr++>15000)
+    {    
+      changeCtr=0;
+      
+      if(servo_control_flag==1)
       {
-        servoCurrData[currServo].curr++;
+        if(servoCurrData[currServo].curr<180)
+        {
+          servoCurrData[currServo].curr++;
+        }
       }
-    }
-    else if(servo_control_flag==-1)
-    {
-      if(servoCurrData[currServo].curr>0)
+      else if(servo_control_flag==-1)
       {
-        servoCurrData[currServo].curr--;
+        if(servoCurrData[currServo].curr>0)
+        {
+          servoCurrData[currServo].curr--;
+        }
       }
     }
   }
