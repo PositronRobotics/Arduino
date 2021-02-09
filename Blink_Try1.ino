@@ -47,7 +47,7 @@ struct sservoCurrData
 struct sservoCurrData servoCurrData[3];
 
 //Temp for Control from Blynk
-int servo_control_flag[3]={0,0,0};
+int servo_control_flag=0;
 int currServo=UNDEFINED;
 
 AF_DCMotor motorLeft(3);
@@ -97,21 +97,6 @@ void loop()
     
     move_home_process=MOVING_TO_HOME_POS;    
     prev_m1=curr_m1;    
-    
-    /*arm_REL.attach(11);
-    arm_REL.write(arm_REL_pos);
-    Serial.println("arm_REL");
-    delay(5000);
-
-    arm_RSL.attach(10);
-    arm_RSL.write(arm_RSL_pos);
-    Serial.println("arm_RSL");
-    delay(5000);
-
-    arm_RSF.attach(9);
-    arm_RSF.write(arm_RSF_pos);
-    Serial.println("arm_RSF");
-    delay(5000);*/
 
     for(initCtr=0;initCtr<NOOFSERVOSARMED;initCtr++)
     {
@@ -143,8 +128,27 @@ void loop()
       }
       delay(4000);
     }
-
     move_home_process=MOVED_TO_HOME_POS;
+  }
+  else if(move_home_process==MOVED_TO_HOME_POS)
+  {
+    //Serial.print("servo_control_flag:");
+    //Serial.println(servo_control_flag);
+    
+    if(servo_control_flag==1)
+    {
+      if(servoCurrData[currServo].curr<180)
+      {
+        servoCurrData[currServo].curr++;
+      }
+    }
+    else if(servo_control_flag==-1)
+    {
+      if(servoCurrData[currServo].curr>0)
+      {
+        servoCurrData[currServo].curr--;
+      }
+    }
   }
 }
 
@@ -173,24 +177,41 @@ void receiveEvent(int howMany)
       Serial.println("Assigned to curr_m1");
       curr_m1=1;      
     }    
-  }
-  
-  /*if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[f]=='f'))
+  }  
+  else if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[2]=='f'))
   {
     currServo=RSF;
   }
-  else if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[f]=='l'))
+  else if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[2]=='l'))
   {
     currServo=RSL;
   }
-  else if((rcmd[0]=='r') && (rcmd[1]=='e') && (rcmd[f]=='l'))
+  else if((rcmd[0]=='r') && (rcmd[1]=='e') && (rcmd[2]=='l'))
   {
     currServo=REL;
   }
   else if((rcmd[0]=='V') && (rcmd[1]=='2'))
   {
-    
-  }*/
+    if(rcmd[2]=='0')
+    {
+      servo_control_flag=0;
+    }
+    else  if(rcmd[2]=='1')
+    {
+      servo_control_flag=1;
+    }
+  }
+  else if((rcmd[0]=='V') && (rcmd[1]=='3'))
+  {
+    if(rcmd[2]=='0')
+    {
+      servo_control_flag=0;
+    }
+    else  if(rcmd[2]=='1')
+    {
+      servo_control_flag=-1;
+    }
+  }  
 }
 
 void requestEvent()
@@ -202,72 +223,22 @@ void requestEvent()
 }
 
 /*void UpdateServos(void)
-{
-  if(serInput==97)
-  {
-    if(arm_RSL_pos<180)
-    {
-      arm_RSL_pos++;
-    }
-  }
-  else if(serInput==122)
-  {
-    if(arm_RSL_pos>0)
-    {
-      arm_RSL_pos--;
-    }
-  }
-  else if(serInput==115)
-  {
-    if(arm_RSF_pos<180)
-    {
-      arm_RSF_pos++;
-    }
-  }
-  else if(serInput==120)
-  {
-    if(arm_RSF_pos>0)
-    {
-      arm_RSF_pos--;
-    }
-  }
-  else if(serInput==100)
-  {
-    if(arm_REL_pos<114)
-    {
-      arm_REL_pos++;
-    }
-  }
-  else if(serInput==99)
-  {
-    if(arm_REL_pos>0)
-    {
-      arm_REL_pos--;
-    }
-  }
-  
-  Serial.print("arm_RSL_pos:");
-  Serial.print(arm_RSL_pos);
-  Serial.print(" ;arm_RSF_pos:");
-  Serial.print(arm_RSF_pos);
-  Serial.print(" ;Uarm_REL_pos:");
-  Serial.println(arm_REL_pos);            
-  
+{           
   if(prev_arm_RSL_pos!=arm_RSL_pos)
   {
     prev_arm_RSL_pos=arm_RSL_pos;
-    RSL.write(arm_RSL_pos);
+    //RSL.write(arm_RSL_pos);
   }
   
   if(prev_arm_RSF_pos!=arm_RSF_pos)
   {
     prev_arm_RSF_pos=arm_RSF_pos;
-    servoShoulderLeftFrontal.write(arm_RSF_pos);
+    //servoShoulderLeftFrontal.write(arm_RSF_pos);
   }  
   
   if(prev_arm_REL_pos!=arm_REL_pos)
   {
     prev_arm_REL_pos=arm_REL_pos;
-    servoElbowLeft.write(arm_REL_pos);
+    //servoElbowLeft.write(arm_REL_pos);
   }
 }*/
