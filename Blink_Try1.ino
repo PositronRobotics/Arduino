@@ -88,8 +88,8 @@ void setup()
 
 void loop()
 {
-  char values[25];
   //Serial.println("in LOOP");
+  int initCtr,j;
   
   if((prev_m1==0) && (curr_m1==1))
   {
@@ -113,12 +113,12 @@ void loop()
     Serial.println("arm_RSF");
     delay(5000);*/
 
-    for(int initCtr=0;initCtr<NOOFSERVOSARMED;initCtr++)
+    for(initCtr=0;initCtr<NOOFSERVOSARMED;initCtr++)
     {
       //Serial.print("initCtr loop:");
       //Serial.println(initCtr);
       
-      for(int j=0;j<NOOFSERVOSARMED;j++)
+      for(j=0;j<NOOFSERVOSARMED;j++)
       {
         //Serial.print("j loop:");
         //Serial.println(j);
@@ -130,11 +130,6 @@ void loop()
           //Serial.println("if condn");
           //servoHW[j].attach(servoConstData[j].pin);
           //servoHW[j].write(servoConstData[j].InitialPos);
-          
-          //sprintf(values,"Servo[%d].attach[%d]",j,servoConstData[j].pin);
-          //Serial.println(values);
-          //sprintf(values,"Servo[%d].write[%d]",j,servoConstData[j].initialPos);
-          //Serial.println(values);
 
           Serial.print("Servo:");
           Serial.print(j);
@@ -146,12 +141,11 @@ void loop()
           break;
         }
       }
+      delay(4000);
     }
 
     move_home_process=MOVED_TO_HOME_POS;
   }
-
-  //if(
 }
 
 // function that executes whenever data is received from master
@@ -201,7 +195,7 @@ void receiveEvent(int howMany)
 
 void requestEvent()
 {
-  char values[25];
+  char values[26];
   sprintf(values,"AR:RSF:%03d,RSL:%03d,REL:%03d",servoCurrData[0].curr,servoCurrData[1].curr,servoCurrData[REL].curr);
   //Serial.println(values); 
   Wire.write(values);
