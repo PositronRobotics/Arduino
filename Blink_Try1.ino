@@ -2,17 +2,19 @@
 #include <Wire.h>
 #include "AFMotor.h"
 
-#define NOOFSERVOSARMED 4
+#define NOOFSERVOSARMED 5
 
 #define ARM_RSF_POS_HOME 38
 #define ARM_RSL_POS_HOME 159
 #define ARM_REL_POS_HOME 103
-#define ARM_NAZ_POS_HOME 2
+#define ARM_NAZ_POS_HOME 90
+#define ARM_NEL_POS_HOME 90
 
 #define ARM_RSF_PIN 9
 #define ARM_RSL_PIN 10
 #define ARM_REL_PIN 11
 #define ARM_NAZ_PIN 14
+#define ARM_NEL_PIN 15
 
 #define UNDEFINED 9
 #define MOVING_TO_HOME_POS 0
@@ -22,7 +24,7 @@
 
 #define UNDEFINED 999
 
-enum ArmServoEnum{RSF,RSL,REL,NAZ};
+enum ArmServoEnum{RSF,RSL,REL,NAZ,NEL};
 
 struct sservoConstData
 {
@@ -36,7 +38,8 @@ struct sservoConstData servoConstData[NOOFSERVOSARMED]=
   {ARM_RSF_PIN,ARM_RSF_POS_HOME,2},
   {ARM_RSL_PIN,ARM_RSL_POS_HOME,1},
   {ARM_REL_PIN,ARM_REL_POS_HOME,0},    
-  {ARM_NAZ_PIN,ARM_NAZ_POS_HOME,3},    
+  {ARM_NAZ_PIN,ARM_NAZ_POS_HOME,3},
+  {ARM_NEL_PIN,ARM_NEL_POS_HOME,4},
 };
 
 Servo servoHW[NOOFSERVOSARMED];
@@ -199,7 +202,11 @@ void receiveEvent(int howMany)
   else if((rcmd[0]=='n') && (rcmd[1]=='a') && (rcmd[2]=='z'))
   {
     currServo=NAZ;
-  }  
+  }
+  else if((rcmd[0]=='n') && (rcmd[1]=='e') && (rcmd[2]=='l'))
+  {
+    currServo=NEL;
+  }   
   else if((rcmd[0]=='V') && (rcmd[1]=='2'))
   {
     if(rcmd[2]=='0')
@@ -227,7 +234,7 @@ void receiveEvent(int howMany)
 void requestEvent()
 {
   char values[26];
-  sprintf(values,"ARRSF%03dRSL%03dREL%03dNAZ%03d",servoCurrData[RSF].curr,servoCurrData[RSL].curr,servoCurrData[REL].curr,servoCurrData[NAZ].curr);
+  sprintf(values,"AR,F%03d,L%03d,E%03d,A%03d,Z%03d",servoCurrData[RSF].curr,servoCurrData[RSL].curr,servoCurrData[REL].curr,servoCurrData[NAZ].curr,servoCurrData[NEL].curr);
   Wire.write(values);
 }
 
