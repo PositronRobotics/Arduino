@@ -112,8 +112,8 @@ void loop()
         if(initCtr==servoConstData[j].initOrder)
         {
           //Serial.println("if condn");
-          //servoHW[j].attach(servoConstData[j].pin);
-          //servoHW[j].write(servoConstData[j].InitialPos);
+          servoHW[j].attach(servoConstData[j].pin);
+          servoHW[j].write(servoConstData[j].initialPos);
 
           Serial.print("Servo:");
           Serial.print(j);
@@ -149,6 +149,8 @@ void loop()
           servoCurrData[currServo].curr--;
         }
       }
+
+      UpdateServos();
     }
   }
 }
@@ -223,23 +225,15 @@ void requestEvent()
   Wire.write(values);
 }
 
-/*void UpdateServos(void)
-{           
-  if(prev_arm_RSL_pos!=arm_RSL_pos)
+void UpdateServos(void)
+{
+  int updateCtr;  
+  for(updateCtr=0;updateCtr<NOOFSERVOSARMED;updateCtr++)
   {
-    prev_arm_RSL_pos=arm_RSL_pos;
-    //RSL.write(arm_RSL_pos);
+    if(servoCurrData[updateCtr].prev!=servoCurrData[updateCtr].curr)
+    {      
+      servoHW[updateCtr].write(servoCurrData[updateCtr].curr);
+      servoCurrData[updateCtr].prev=servoCurrData[updateCtr].curr;
+    }
   }
-  
-  if(prev_arm_RSF_pos!=arm_RSF_pos)
-  {
-    prev_arm_RSF_pos=arm_RSF_pos;
-    //servoShoulderLeftFrontal.write(arm_RSF_pos);
-  }  
-  
-  if(prev_arm_REL_pos!=arm_REL_pos)
-  {
-    prev_arm_REL_pos=arm_REL_pos;
-    //servoElbowLeft.write(arm_REL_pos);
-  }
-}*/
+}
