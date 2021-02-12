@@ -143,9 +143,19 @@ void loop()
       
       if(servo_control_flag==1)
       {
-        if(servoCurrData[currServo].curr<180)
+        if(currServo==RSL)
         {
-          servoCurrData[currServo].curr++;
+          if(servoCurrData[currServo].curr<165)
+          {
+            servoCurrData[currServo].curr++;
+          }          
+        }
+        else
+        {
+          if(servoCurrData[currServo].curr<180)
+          {
+            servoCurrData[currServo].curr++;
+          }
         }
       }
       else if(servo_control_flag==-1)
@@ -234,7 +244,7 @@ void receiveEvent(int howMany)
 void requestEvent()
 {
   char values[26];
-  sprintf(values,"AR,F%03d,L%03d,E%03d,A%03d,Z%03d",servoCurrData[RSF].curr,servoCurrData[RSL].curr,servoCurrData[REL].curr,servoCurrData[NAZ].curr,servoCurrData[NEL].curr);
+  sprintf(values,"ARF%03d,L%03d,E%03d,A%03d,Z%03d",servoCurrData[RSF].curr,servoCurrData[RSL].curr,servoCurrData[REL].curr,servoCurrData[NAZ].curr,servoCurrData[NEL].curr);
   Wire.write(values);
 }
 
