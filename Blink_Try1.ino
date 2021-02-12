@@ -137,37 +137,7 @@ void loop()
   }
   else if(move_home_process==MOVED_TO_HOME_POS)
   {
-    if(changeCtr++>15000)
-    {    
-      changeCtr=0;
-      
-      if(servo_control_flag==1)
-      {
-        if(currServo==RSL)
-        {
-          if(servoCurrData[currServo].curr<165)
-          {
-            servoCurrData[currServo].curr++;
-          }          
-        }
-        else
-        {
-          if(servoCurrData[currServo].curr<180)
-          {
-            servoCurrData[currServo].curr++;
-          }
-        }
-      }
-      else if(servo_control_flag==-1)
-      {
-        if(servoCurrData[currServo].curr>0)
-        {
-          servoCurrData[currServo].curr--;
-        }
-      }
-
-      UpdateServos();
-    }
+    manualChangeFromBlynk();
   }
 }
 
@@ -246,6 +216,40 @@ void requestEvent()
   char values[26];
   sprintf(values,"ARF%03d,L%03d,E%03d,A%03d,Z%03d",servoCurrData[RSF].curr,servoCurrData[RSL].curr,servoCurrData[REL].curr,servoCurrData[NAZ].curr,servoCurrData[NEL].curr);
   Wire.write(values);
+}
+
+void manualChangeFromBlynk(void)
+{
+  if(changeCtr++>15000)
+  {    
+    changeCtr=0;
+    
+    if(servo_control_flag==1)
+    {
+      if(currServo==RSL)
+      {
+        if(servoCurrData[currServo].curr<165)
+        {
+          servoCurrData[currServo].curr++;
+        }          
+      }
+      else
+      {
+        if(servoCurrData[currServo].curr<180)
+        {
+          servoCurrData[currServo].curr++;
+        }
+      }
+    }
+    else if(servo_control_flag==-1)
+    {
+      if(servoCurrData[currServo].curr>0)
+      {
+        servoCurrData[currServo].curr--;
+      }
+    }  
+    UpdateServos();
+  }
 }
 
 void UpdateServos(void)
