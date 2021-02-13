@@ -2,9 +2,13 @@
 #include <Wire.h>
 #include "AFMotor.h"
 
+//PreProcessor
+//------------
+
+//PreProcessor - Servo Basics
 #define NOOFSERVOSARMED 5
 
-#define ARM_RSF_POS_HOME 38
+#define ARM_RSF_POS_HOME 43
 #define ARM_RSL_POS_HOME 159
 #define ARM_REL_POS_HOME 103
 #define ARM_NAZ_POS_HOME 90
@@ -20,13 +24,24 @@
 #define MOVING_TO_HOME_POS 0
 #define MOVED_TO_HOME_POS 1
 
-#define WHEEL_SPEED_HIGH 255
-
 #define UNDEFINED_GENERAL 999
 
+//PreProcessor - Choreography
 #define MANUAL 0
-#define AUTOMATIC 1
+#define CHOREOGRAPHED 1
 
+#define NOOFCHOREOSTATES 1
+
+#define CHOREO_STATE_IDLE 999
+#define CHOREO_STATE_WALK_GAIT 1
+
+//PreProcessor - Vehicle
+#define WHEEL_SPEED_HIGH 255
+
+//Structures and Tables
+//---------------------
+
+//Structures and Tables - Servo Basics
 enum ArmServoEnum{RSF,RSL,REL,NAZ,NEL};
 
 struct sservoConstData
@@ -55,19 +70,39 @@ struct sservoCurrData
 
 struct sservoCurrData servoCurrData[NOOFSERVOSARMED];
 
-int controlMode=AUTOMATIC;
+//Structures and Tables - Choreo
+struct schoreoTable
+{
+  int choreoState;
+  int order;
+  int duration;
+};
 
-//Temp for Control from Blynk
+struct schoreoTable choreoTable[1];
+
+//Variables
+//---------
+
+//Variables - for Manual Control from Blynk
 int servo_control_flag=0;
 int currServo=UNDEFINED_GENERAL;
 int changeCtr=0;
+int controlMode=CHOREOGRAPHED;
 
-AF_DCMotor motorLeft(3);
-AF_DCMotor motorRight(4);
-
+//Variables - Servo Basics
 int move_home_process=RANDOM_INITIAL_POS;
 
+//Variables - Vehicle
+AF_DCMotor motorLeft(3);
+AF_DCMotor motorRight(4);
 int wheelsDir=0;
+
+//Variables - Choreo
+int choreoTick=0;
+int choreo_state_curr=CHOREO_STATE_INITIAL;
+
+//func declarations
+//-----------------
 
 void receiveEvent(int howMany);
 void requestEvent();
@@ -140,7 +175,7 @@ void receiveEvent(int howMany)
     }
     else if((rcmd[0]=='c') && (rcmd[1]=='m') && (rcmd[2]=='a'))
     {
-      controlMode=AUTOMATIC;
+      controlMode=CHOREOGRAPHED;
     }     
     
     if(controlMode==MANUAL)
@@ -256,6 +291,17 @@ void manualChangeFromBlynk(void)
       }
     }  
     UpdateServos();
+  }
+}
+
+void choreography(void)
+{
+  if(choreoTick++>10000)
+  {
+    if(choreo_state_curr==CHOREO_STATE_INITIAL)
+    {
+      
+    }
   }
 }
 
