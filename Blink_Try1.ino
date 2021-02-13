@@ -26,6 +26,9 @@
 
 #define UNDEFINED_GENERAL 999
 
+#define DELAY_BETWEEN_SERVOS_HOME_COMING 4000
+#define COUNT_FOR_A_SECOND 300000
+
 //PreProcessor - Choreography
 #define MANUAL 0
 #define CHOREOGRAPHED 1
@@ -78,7 +81,10 @@ struct schoreoTable
   int duration;
 };
 
-struct schoreoTable choreoTable[1];
+struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
+{
+  {CHOREO_STATE_WALK_GAIT,0,5},
+};
 
 //Variables
 //---------
@@ -86,7 +92,6 @@ struct schoreoTable choreoTable[1];
 //Variables - for Manual Control from Blynk
 int servo_control_flag=0;
 int currServo=UNDEFINED_GENERAL;
-int changeCtr=0;
 int controlMode=CHOREOGRAPHED;
 
 //Variables - Servo Basics
@@ -98,8 +103,8 @@ AF_DCMotor motorRight(4);
 int wheelsDir=0;
 
 //Variables - Choreo
-int choreoTick=0;
-int choreo_state_curr=CHOREO_STATE_INITIAL;
+int choreoSeconds=0;
+int choreo_state_curr=CHOREO_STATE_IDLE;
 
 //func declarations
 //-----------------
@@ -141,6 +146,10 @@ void loop()
     {
       manualChangeFromBlynk();
     }
+    else if(controlMode=CHOREOGRAPHED)
+    {
+      choreography(); 
+    }    
   }
 }
 
@@ -256,12 +265,14 @@ void moveHome_allServos1by1(void)
         break;
       }
     }
-    delay(4000);
+    delay(DELAY_BETWEEN_SERVOS_HOME_COMING);
   }
 }
 
 void manualChangeFromBlynk(void)
 {
+  static int changeCtr=0;
+  
   if(changeCtr++>15000)
   {    
     changeCtr=0;
@@ -296,12 +307,14 @@ void manualChangeFromBlynk(void)
 
 void choreography(void)
 {
-  if(choreoTick++>10000)
+  static long choreoCtr=0;
+  
+  if(choreoCtr++>COUNT_FOR_A_SECOND)
   {
-    if(choreo_state_curr==CHOREO_STATE_INITIAL)
-    {
-      
-    }
+    choreoCtr=0;
+    choreoSeconds++;
+    Serial.print("choreoSeconds:");
+    Serial.println(choreoSeconds);
   }
 }
 
