@@ -33,11 +33,13 @@
 #define MANUAL 0
 #define CHOREOGRAPHED 1
 
-#define NOOFCHOREOSTATES 2
+#define NOOFCHOREOSTATES 3
 
 #define CHOREO_STATE_IDLE 999
+
+#define CHOREO_STATE_INITAL_WAIT 0
 #define CHOREO_STATE_WALK_GAIT 1
-#define CHOREO_STATE_WALK_DUMMY 2
+#define CHOREO_STATE_DUMMY 2
 
 //PreProcessor - Vehicle
 #define WHEEL_SPEED_HIGH 255
@@ -78,13 +80,18 @@ struct sservoCurrData servoCurrData[NOOFSERVOSARMED];
 struct schoreoTable
 {
   int choreoState;
+  void (*proc)(void);
   int duration;
 };
 
+void choreo_state_walk_gait(void);
+void choreo_state_dummy(void);
+
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
-  {CHOREO_STATE_WALK_GAIT,5},
-  {CHOREO_STATE_DUMMY,8},
+  {CHOREO_STATE_INITAL_WAIT,NULL,4},
+  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,6},
+  {CHOREO_STATE_DUMMY,choreo_state_dummy,8},
 };
 
 //Variables
@@ -102,10 +109,6 @@ int move_home_process=RANDOM_INITIAL_POS;
 AF_DCMotor motorLeft(3);
 AF_DCMotor motorRight(4);
 int wheelsDir=0;
-
-//Variables - Choreo
-int choreoSeconds=0;
-int choreo_state_curr=CHOREO_STATE_IDLE;
 
 //func declarations
 //-----------------
@@ -309,14 +312,39 @@ void manualChangeFromBlynk(void)
 void choreography(void)
 {
   static long choreo1SecondCtr=0;
-  
-  if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
+  static int choreoSeconds=0;
+
+  static int choreo_state_cur=0;
+
+  if(choreo_state_cur<NOOFCHOREOSTATES)
   {
-    choreo1SecondCtr=0;
-    choreoSeconds++;
-    Serial.print("choreoSeconds:");
-    Serial.println(choreoSeconds);
+    if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
+    {
+      choreoTable[choreo_state_cur].proc();   
+      
+      if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
+      {
+        choreo1SecondCtr=0;
+        choreoSeconds++;
+      }    
+    }
+    else
+    {
+      choreo1SecondCtr=0;
+      choreoSeconds=0;
+      choreo_state_cur++;
+    }
   }
+}
+
+void choreo_state_walk_gait(void)
+{
+  Serial.println("choreo_state_walk_gait"); 
+}
+
+void choreo_state_dummy(void)
+{
+  Serial.println("choreo_state_dummy"); 
 }
 
 void UpdateServos(void)
