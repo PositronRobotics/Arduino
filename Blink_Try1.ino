@@ -315,10 +315,10 @@ void manualChangeFromBlynk(void)
 
 void choreography(void)
 {
-  //static int choreo_state_cur=0;
+  static int choreo_state_cur=0;
 
-  //if(choreo_state_cur<NOOFCHOREOSTATES)
-  //{
+  if(choreo_state_cur<NOOFCHOREOSTATES)
+  {
     //Serial.print("If - choreo1SecondCtr"); 
 
     if(choreo1SecondCtr==0)
@@ -326,19 +326,19 @@ void choreography(void)
       Serial.println(choreoSeconds);
     } 
     
-    /*if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
+    if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
     {
       if(choreoTable[choreo_state_cur].proc!=NULL)
       {
         choreoTable[choreo_state_cur].proc();
-      }*/  
+      }  
       
       if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
       {
         choreo1SecondCtr=0;
         choreoSeconds++;
       }   
-    /*}
+    }
     else
     {
       choreo1SecondCtr=0;
@@ -346,18 +346,18 @@ void choreography(void)
       choreo_state_cur++;
       Serial.print("Else - choreoSeconds"); 
       Serial.println(choreoSeconds);      
-    }*/
-  //}
+    }
+  }
 }
 
 void choreo_state_walk_gait(void)
 {
-  Serial.println("choreo_state_walk_gait"); 
+  //Serial.println("choreo_state_walk_gait"); 
 }
 
 void choreo_state_dummy(void)
 {
-  Serial.println("choreo_state_dummy"); 
+  //Serial.println("choreo_state_dummy"); 
 }
 
 void UpdateServos(void)
