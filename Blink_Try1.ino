@@ -33,10 +33,11 @@
 #define MANUAL 0
 #define CHOREOGRAPHED 1
 
-#define NOOFCHOREOSTATES 1
+#define NOOFCHOREOSTATES 2
 
 #define CHOREO_STATE_IDLE 999
 #define CHOREO_STATE_WALK_GAIT 1
+#define CHOREO_STATE_WALK_DUMMY 2
 
 //PreProcessor - Vehicle
 #define WHEEL_SPEED_HIGH 255
@@ -77,13 +78,13 @@ struct sservoCurrData servoCurrData[NOOFSERVOSARMED];
 struct schoreoTable
 {
   int choreoState;
-  int order;
   int duration;
 };
 
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
-  {CHOREO_STATE_WALK_GAIT,0,5},
+  {CHOREO_STATE_WALK_GAIT,5},
+  {CHOREO_STATE_DUMMY,8},
 };
 
 //Variables
@@ -307,11 +308,11 @@ void manualChangeFromBlynk(void)
 
 void choreography(void)
 {
-  static long choreoCtr=0;
+  static long choreo1SecondCtr=0;
   
-  if(choreoCtr++>COUNT_FOR_A_SECOND)
+  if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
   {
-    choreoCtr=0;
+    choreo1SecondCtr=0;
     choreoSeconds++;
     Serial.print("choreoSeconds:");
     Serial.println(choreoSeconds);
