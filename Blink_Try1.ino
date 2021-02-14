@@ -26,8 +26,8 @@
 
 #define UNDEFINED_GENERAL 999
 
-#define DELAY_BETWEEN_SERVOS_HOME_COMING 4000
-#define COUNT_FOR_A_SECOND 300000
+#define DELAY_BETWEEN_SERVOS_HOME_COMING 1000
+#define COUNT_FOR_A_SECOND 280000
 
 //PreProcessor - Choreography
 #define MANUAL 0
@@ -102,6 +102,9 @@ int servo_control_flag=0;
 int currServo=UNDEFINED_GENERAL;
 int controlMode=CHOREOGRAPHED;
 
+long choreo1SecondCtr=0;
+int choreoSeconds=0;
+
 //Variables - Servo Basics
 int move_home_process=RANDOM_INITIAL_POS;
 
@@ -115,6 +118,7 @@ int wheelsDir=0;
 
 void receiveEvent(int howMany);
 void requestEvent();
+void UpdateServos(void);
 
 void setup()
 { 
@@ -311,30 +315,39 @@ void manualChangeFromBlynk(void)
 
 void choreography(void)
 {
-  static long choreo1SecondCtr=0;
-  static int choreoSeconds=0;
+  //static int choreo_state_cur=0;
 
-  static int choreo_state_cur=0;
+  //if(choreo_state_cur<NOOFCHOREOSTATES)
+  //{
+    //Serial.print("If - choreo1SecondCtr"); 
 
-  if(choreo_state_cur<NOOFCHOREOSTATES)
-  {
-    if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
+    if(choreo1SecondCtr==0)
     {
-      choreoTable[choreo_state_cur].proc();   
+      Serial.println(choreoSeconds);
+    } 
+    
+    /*if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
+    {
+      if(choreoTable[choreo_state_cur].proc!=NULL)
+      {
+        choreoTable[choreo_state_cur].proc();
+      }*/  
       
       if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
       {
         choreo1SecondCtr=0;
         choreoSeconds++;
-      }    
-    }
+      }   
+    /*}
     else
     {
       choreo1SecondCtr=0;
       choreoSeconds=0;
       choreo_state_cur++;
-    }
-  }
+      Serial.print("Else - choreoSeconds"); 
+      Serial.println(choreoSeconds);      
+    }*/
+  //}
 }
 
 void choreo_state_walk_gait(void)
