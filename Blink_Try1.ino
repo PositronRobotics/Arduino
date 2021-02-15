@@ -27,7 +27,7 @@
 #define UNDEFINED_GENERAL 999
 
 #define DELAY_BETWEEN_SERVOS_HOME_COMING 1000
-#define COUNT_FOR_A_SECOND 280000
+#define COUNT_FOR_A_SECOND 200000
 
 //PreProcessor - Choreography
 #define MANUAL 0
@@ -89,9 +89,9 @@ void choreo_state_dummy(void);
 
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
-  {CHOREO_STATE_INITAL_WAIT,NULL,4},
-  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,6},
-  {CHOREO_STATE_DUMMY,choreo_state_dummy,8},
+  {CHOREO_STATE_INITAL_WAIT,NULL,2},
+  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
+  {CHOREO_STATE_DUMMY,choreo_state_dummy,3},
 };
 
 //Variables
@@ -190,7 +190,7 @@ void receiveEvent(int howMany)
     {
       controlMode=MANUAL;
     }
-    else if((rcmd[0]=='c') && (rcmd[1]=='m') && (rcmd[2]=='a'))
+    else if((rcmd[0]=='c') && (rcmd[1]=='m') && (rcmd[2]=='c'))
     {
       controlMode=CHOREOGRAPHED;
     }     
@@ -352,12 +352,24 @@ void choreography(void)
 
 void choreo_state_walk_gait(void)
 {
-  //Serial.println("choreo_state_walk_gait"); 
+  static int ctr=0;
+
+  if(ctr++>1000)
+  {
+    ctr=0;
+    Serial.println("choreo_state_walk_gait");
+  }
 }
 
 void choreo_state_dummy(void)
 {
-  //Serial.println("choreo_state_dummy"); 
+  static int ctr=0;
+
+  if(ctr++>1000)
+  {
+    ctr=0;
+    Serial.println("choreo_state_dummy");
+  }   
 }
 
 void UpdateServos(void)
