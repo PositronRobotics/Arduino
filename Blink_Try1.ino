@@ -145,9 +145,12 @@ void loop()
   
   if(move_home_process==RANDOM_INITIAL_POS)
   {
-    if(delayCtr_beforeHomeComing++>=DELAY_AFTER_POWERINGON_BEFORE_HOME_COMING)
+    if(controlMode==CHOREOGRAPHED)
     {
-      move_home_process=MOVING_TO_HOME_POS;            
+      if(delayCtr_beforeHomeComing++>=DELAY_AFTER_POWERINGON_BEFORE_HOME_COMING)
+      {
+        move_home_process=MOVING_TO_HOME_POS;            
+      }
     }
   }
   else if(move_home_process==MOVING_TO_HOME_POS)
@@ -186,9 +189,12 @@ void receiveEvent(int howMany)
 
   if(move_home_process==RANDOM_INITIAL_POS)
   {
-    if((rcmd[0]=='m') && (rcmd[1]=='1'))
-    {  
-      move_home_process=MOVING_TO_HOME_POS;
+    if(controlMode==MANUAL)
+    {
+      if((rcmd[0]=='m') && (rcmd[1]=='1'))
+      {  
+        move_home_process=MOVING_TO_HOME_POS;
+      }
     }
   }
   else if(move_home_process==MOVED_TO_HOME_POS)
