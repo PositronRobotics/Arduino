@@ -90,7 +90,7 @@ void choreo_state_dummy(void);
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_INITAL_WAIT,NULL,2},
-  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
+  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,10},
   {CHOREO_STATE_DUMMY,choreo_state_dummy,3},
 };
 
@@ -101,9 +101,6 @@ struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 int servo_control_flag=0;
 int currServo=UNDEFINED_GENERAL;
 int controlMode=CHOREOGRAPHED;
-
-long choreo1SecondCtr=0;
-int choreoSeconds=0;
 
 //Variables - Servo Basics
 int move_home_process=RANDOM_INITIAL_POS;
@@ -317,6 +314,9 @@ void choreography(void)
 {
   static int choreo_state_cur=0;
 
+  static long choreo1SecondCtr=0;
+  static int choreoSeconds=0;  
+
   if(choreo_state_cur<NOOFCHOREOSTATES)
   {
     //Serial.print("If - choreo1SecondCtr"); 
@@ -352,13 +352,37 @@ void choreography(void)
 
 void choreo_state_walk_gait(void)
 {
-  static int ctr=0;
+  static int zeroTo180=1;
+  static long driveMotorctr=0;
 
-  if(ctr++>1000)
+  if(driveMotorctr++>=3000)
   {
-    ctr=0;
-    Serial.println("choreo_state_walk_gait");
-  }
+    driveMotorctr=0;
+  
+    if(zeroTo180==1)
+    {
+      if(servoCurrData[RSF].curr<95)
+      {
+        servoCurrData[RSF].curr++; 
+      }
+      else if(servoCurrData[RSF].curr==95)
+      {
+        zeroTo180=0;
+      }
+    }
+    else
+    {
+      if(servoCurrData[RSF].curr>0)
+      {
+        servoCurrData[RSF].curr--;
+      }
+      else if(servoCurrData[RSF].curr==0)
+      {
+        zeroTo180=1;
+      }
+    }
+    UpdateServos();
+  }  
 }
 
 void choreo_state_dummy(void)
