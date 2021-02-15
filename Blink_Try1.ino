@@ -26,8 +26,9 @@
 
 #define UNDEFINED_GENERAL 999
 
-#define DELAY_BETWEEN_SERVOS_HOME_COMING 1000
+#define DELAY_BETWEEN_SERVOS_HOME_COMING 2000
 #define COUNT_FOR_A_SECOND 200000
+#define DELAY_AFTER_POWERINGON_BEFORE_HOME_COMING 4000
 
 //PreProcessor - Choreography
 #define MANUAL 0
@@ -139,8 +140,17 @@ void setup()
 }
 
 void loop()
-{  
-  if(move_home_process==MOVING_TO_HOME_POS)
+{
+  static int delayCtr_beforeHomeComing=0;
+  
+  if(move_home_process==RANDOM_INITIAL_POS)
+  {
+    if(delayCtr_beforeHomeComing++>=DELAY_AFTER_POWERINGON_BEFORE_HOME_COMING)
+    {
+      move_home_process=MOVING_TO_HOME_POS;            
+    }
+  }
+  else if(move_home_process==MOVING_TO_HOME_POS)
   {  
     moveHome_allServos1by1();
     move_home_process=MOVED_TO_HOME_POS;
