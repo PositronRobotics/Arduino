@@ -334,14 +334,7 @@ void choreography(void)
   static int choreoSeconds=0;  
 
   if(choreo_state_cur<NOOFCHOREOSTATES)
-  {
-    //Serial.print("If - choreo1SecondCtr"); 
-
-    if(choreo1SecondCtr==0)
-    {
-      Serial.println(choreoSeconds);
-    } 
-    
+  {    
     if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
     {
       if(choreoTable[choreo_state_cur].proc!=NULL)
