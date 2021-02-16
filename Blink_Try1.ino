@@ -364,32 +364,49 @@ void choreo_state_walk_gait(void)
   static int zeroTo180=1;
   static long driveMotorctr=0;
 
+  static int walkGait_SubState=0;
+
   if(driveMotorctr++>=3000)
   {
     driveMotorctr=0;
-  
-    if(zeroTo180==1)
+
+    if(walkGait_SubState==0)
     {
-      if(servoCurrData[RSF].curr<95)
+      if(servoCurrData[RSL].curr>137)
       {
-        servoCurrData[RSF].curr++; 
+        servoCurrData[RSL].curr--;        
       }
-      else if(servoCurrData[RSF].curr==95)
+      else
       {
-        zeroTo180=0;
+        walkGait_SubState=1;
       }
     }
-    else
+    else if(walkGait_SubState==1)
     {
-      if(servoCurrData[RSF].curr>0)
+      if(zeroTo180==1)
       {
-        servoCurrData[RSF].curr--;
+        if(servoCurrData[RSF].curr<95)
+        {
+          servoCurrData[RSF].curr++; 
+        }
+        else if(servoCurrData[RSF].curr==95)
+        {
+          zeroTo180=0;
+        }
       }
-      else if(servoCurrData[RSF].curr==0)
+      else
       {
-        zeroTo180=1;
-      }
+        if(servoCurrData[RSF].curr>0)
+        {
+          servoCurrData[RSF].curr--;
+        }
+        else if(servoCurrData[RSF].curr==0)
+        {
+          zeroTo180=1;
+        }
+      }      
     }
+    
     UpdateServos();
   }  
 }
