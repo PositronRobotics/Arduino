@@ -389,13 +389,20 @@ void choreo_state_walk_gait(void)
         {
           servoCurrData[RSF].curr++;
 
+          //RSL and REL Derivation
           if(servoCurrData[RSF].curr>=43)
           {
-            if(servoCurrData[RSF].curr+82<165)
+            if(servoCurrData[RSF].curr+82<=165)
             {
               servoCurrData[RSL].curr=servoCurrData[RSF].curr+82;
             }
+
+            if(servoCurrData[RSL].curr>=165)
+            {
+              servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
+            }
           }
+          //RSL and REL Derivation - Ends
         }
         else if(servoCurrData[RSF].curr==105)
         {
@@ -408,13 +415,20 @@ void choreo_state_walk_gait(void)
         {
           servoCurrData[RSF].curr--;
 
+          //RSL and REL Derivation
           if(servoCurrData[RSF].curr>=43)
           {
-            if(servoCurrData[RSF].curr+82<165)
+            if(servoCurrData[RSF].curr+82<=165)
             {
               servoCurrData[RSL].curr=servoCurrData[RSF].curr+82;
             }
-          }                  
+
+            if(servoCurrData[RSL].curr>=165)
+            {
+              servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
+            }
+          }
+          //RSL and REL Derivation - Ends                          
         }
         else if(servoCurrData[RSF].curr==0)
         {
@@ -426,7 +440,9 @@ void choreo_state_walk_gait(void)
     Serial.print("servoCurrData[RSF].curr=");
     Serial.print(servoCurrData[RSF].curr);
     Serial.print(", servoCurrData[RSL].curr=");
-    Serial.println(servoCurrData[RSL].curr);    
+    Serial.print(servoCurrData[RSL].curr);
+    Serial.print(", servoCurrData[REL].curr=");
+    Serial.println(servoCurrData[REL].curr);        
     
     UpdateServos();
   }  
