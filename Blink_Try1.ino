@@ -359,6 +359,28 @@ void choreography(void)
   }
 }
 
+void choreo_walk_gait_derive_RSL_and_REL(void)
+{
+  if(servoCurrData[RSF].curr>=43)
+  {
+    if(servoCurrData[RSF].curr+82<=165)
+    {
+      servoCurrData[RSL].curr=servoCurrData[RSF].curr+82;
+    }
+    if(servoCurrData[RSL].curr>=165)
+    {
+      servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
+    }
+  }
+  else
+  {
+    if((servoCurrData[RSF].curr+84+((42-servoCurrData[RSF].curr)*2))<=165)
+    {
+      servoCurrData[RSL].curr=(servoCurrData[RSF].curr+84+((42-servoCurrData[RSF].curr)*2));
+    }
+  }
+}
+
 void choreo_state_walk_gait(void)
 {
   static int zeroTo180=1;
@@ -388,21 +410,7 @@ void choreo_state_walk_gait(void)
         if(servoCurrData[RSF].curr<105)
         {
           servoCurrData[RSF].curr++;
-
-          //RSL and REL Derivation
-          if(servoCurrData[RSF].curr>=43)
-          {
-            if(servoCurrData[RSF].curr+82<=165)
-            {
-              servoCurrData[RSL].curr=servoCurrData[RSF].curr+82;
-            }
-
-            if(servoCurrData[RSL].curr>=165)
-            {
-              servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
-            }
-          }
-          //RSL and REL Derivation - Ends
+          choreo_walk_gait_derive_RSL_and_REL();
         }
         else if(servoCurrData[RSF].curr==105)
         {
@@ -414,21 +422,7 @@ void choreo_state_walk_gait(void)
         if(servoCurrData[RSF].curr>0)
         {
           servoCurrData[RSF].curr--;
-
-          //RSL and REL Derivation
-          if(servoCurrData[RSF].curr>=43)
-          {
-            if(servoCurrData[RSF].curr+82<=165)
-            {
-              servoCurrData[RSL].curr=servoCurrData[RSF].curr+82;
-            }
-
-            if(servoCurrData[RSL].curr>=165)
-            {
-              servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
-            }
-          }
-          //RSL and REL Derivation - Ends                          
+          choreo_walk_gait_derive_RSL_and_REL();
         }
         else if(servoCurrData[RSF].curr==0)
         {
