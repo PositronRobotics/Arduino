@@ -94,7 +94,7 @@ void choreo_state_dummy(void);
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_INITAL_WAIT,NULL,2},
-  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,10},
+  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,20},
   {CHOREO_STATE_DUMMY,choreo_state_dummy,3},
 };
 
@@ -364,7 +364,7 @@ void choreography(void)
 
 void choreo_walk_gait_derive_RSL_and_REL(void)
 {
-  if(servoCurrData[RSF].curr>=43)
+  if(servoCurrData[RSF].curr>=ARM_RSF_POS_HOME)
   {
     if(servoCurrData[RSF].curr+82<=165)
     {
@@ -391,6 +391,10 @@ void choreo_state_walk_gait(void)
 
   static int walkGait_SubState=0;
 
+  static int timeCtr;
+
+  static int OnlyEven=0;
+
   if(driveMotorctr++>=3000)
   {
     driveMotorctr=0;
@@ -412,8 +416,24 @@ void choreo_state_walk_gait(void)
       {
         if(servoCurrData[RSF].curr<105)
         {
-          servoCurrData[RSF].curr++;
-          choreo_walk_gait_derive_RSL_and_REL();
+          if(servoCurrData[RSF].curr>=18)
+          {
+            servoCurrData[RSF].curr++;
+            choreo_walk_gait_derive_RSL_and_REL();
+          }
+          else
+          {
+            if(OnlyEven==0)
+            {
+              servoCurrData[RSF].curr++;
+              choreo_walk_gait_derive_RSL_and_REL();
+              OnlyEven=1;
+            }
+            else
+            {
+              OnlyEven=0;
+            }
+          }
         }
         else if(servoCurrData[RSF].curr==105)
         {
@@ -424,8 +444,24 @@ void choreo_state_walk_gait(void)
       {
         if(servoCurrData[RSF].curr>0)
         {
-          servoCurrData[RSF].curr--;
-          choreo_walk_gait_derive_RSL_and_REL();
+          if(servoCurrData[RSF].curr>=21)
+          {
+            servoCurrData[RSF].curr--;
+            choreo_walk_gait_derive_RSL_and_REL();
+          }
+          else
+          {
+            if(OnlyEven==0)
+            {
+              servoCurrData[RSF].curr--;
+              choreo_walk_gait_derive_RSL_and_REL();
+              OnlyEven=1;             
+            }
+            else
+            {
+              OnlyEven=0;
+            }
+          }          
         }
         else if(servoCurrData[RSF].curr==0)
         {
@@ -439,7 +475,49 @@ void choreo_state_walk_gait(void)
     Serial.print(", servoCurrData[RSL].curr=");
     Serial.print(servoCurrData[RSL].curr);
     Serial.print(", servoCurrData[REL].curr=");
-    Serial.println(servoCurrData[REL].curr);        
+    Serial.println(servoCurrData[REL].curr);
+
+    if(walkGait_SubState==1)
+    {
+      if(zeroTo180==1)
+      {
+        if(servoCurrData[RSF].curr==ARM_RSF_POS_HOME)
+        {
+          Serial.print("---- Centre Pos, Starting FWD ----");
+          Serial.println(timeCtr);
+          timeCtr=0;
+        }
+        else if(servoCurrData[RSF].curr==105)
+        {
+          Serial.print("---- Reached FWD most pos ----");
+          Serial.println(timeCtr);
+          timeCtr=0;          
+        }
+        else
+        {
+          timeCtr++;
+        }
+      }
+      if(zeroTo180==0)
+      {
+        if(servoCurrData[RSF].curr==ARM_RSF_POS_HOME)
+        {
+          Serial.print("---- Centre Pos, Starting Back ----");
+          Serial.println(timeCtr);
+          timeCtr=0;          
+        }
+        else if(servoCurrData[RSF].curr==0)
+        {
+          Serial.print("---- Reached Backward most pos ----");
+          Serial.println(timeCtr);
+          timeCtr=0;          
+        }
+        else
+        {
+          timeCtr++;
+        }        
+      }      
+    }
     
     UpdateServos();
   }  
