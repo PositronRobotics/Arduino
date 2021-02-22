@@ -12,7 +12,7 @@
 #define ARM_RSL_POS_HOME 159
 #define ARM_REL_POS_HOME 103
 #define ARM_LSF_POS_HOME 146
-#define ARM_LSL_POS_HOME 35
+#define ARM_LSL_POS_HOME 26
 #define ARM_NAZ_POS_HOME 90
 #define ARM_NEL_POS_HOME 90
 
@@ -473,7 +473,7 @@ void choreo_state_walk_gait(void)
       }      
     }
 
-    Serial.print("servoCurrData[RSF].curr=");
+    /*Serial.print("servoCurrData[RSF].curr=");
     Serial.print(servoCurrData[RSF].curr);
     Serial.print(", servoCurrData[RSL].curr=");
     Serial.print(servoCurrData[RSL].curr);
@@ -520,7 +520,7 @@ void choreo_state_walk_gait(void)
           timeCtr++;
         }        
       }      
-    }
+    }*/
     
     UpdateServos();
   }  
