@@ -389,6 +389,19 @@ void choreo_walk_gait_derive_RSL_and_REL(void)
 
 void choreo_state_walk_gait(void)
 {
+  #define COMMON_LATERAL_SPREAD_MAX 34
+  #define COMMON_FROMT_SWING_MAX 62
+  #define COMMON_BACK_SWING_MAX 43
+  #define COMMON_GNG_FRONT_SLOW_BOUNDARY 18
+  #define COMMON_GNG_BACK_SLOW_BOUNDARY 21
+  
+  #define RSL_GAIT_LATERAL_SPREAD_LIMIT ARM_RSL_POS_HOME-COMMON_LATERAL_SPREAD_MAX
+  
+  #define RSF_GAIT_FRONT_LIMIT ARM_RSF_POS_HOME+COMMON_FROMT_SWING_MAX
+  #define RSF_GAIT_BACK_LIMIT ARM_RSF_POS_HOME-COMMON_BACK_SWING_MAX
+  #define RSF_GAIT_GNG_FRONT_SLOW_BOUNDARY RSF_GAIT_BACK_LIMIT+COMMON_GNG_FRONT_SLOW_BOUNDARY
+  #define RSF_GAIT_GNG_BACK_SLOW_BOUNDARY RSF_GAIT_BACK_LIMIT+COMMON_GNG_BACK_SLOW_BOUNDARY
+  
   static int zeroTo180=1;
   static long driveMotorctr=0;
 
@@ -404,7 +417,7 @@ void choreo_state_walk_gait(void)
 
     if(walkGait_SubState==0)
     {
-      if(servoCurrData[RSL].curr>125)
+      if(servoCurrData[RSL].curr>RSL_GAIT_LATERAL_SPREAD_LIMIT)
       {
         servoCurrData[RSL].curr--;        
       }
@@ -417,9 +430,9 @@ void choreo_state_walk_gait(void)
     {
       if(zeroTo180==1)
       {
-        if(servoCurrData[RSF].curr<105)
+        if(servoCurrData[RSF].curr<RSF_GAIT_FRONT_LIMIT)
         {
-          if(servoCurrData[RSF].curr>=18)
+          if(servoCurrData[RSF].curr>=RSF_GAIT_GNG_FRONT_SLOW_BOUNDARY)
           {
             servoCurrData[RSF].curr++;
             choreo_walk_gait_derive_RSL_and_REL();
@@ -438,16 +451,16 @@ void choreo_state_walk_gait(void)
             }
           }
         }
-        else if(servoCurrData[RSF].curr==105)
+        else if(servoCurrData[RSF].curr==RSF_GAIT_FRONT_LIMIT)
         {
           zeroTo180=0;
         }
       }
       else
       {
-        if(servoCurrData[RSF].curr>0)
+        if(servoCurrData[RSF].curr>RSF_GAIT_BACK_LIMIT)
         {
-          if(servoCurrData[RSF].curr>=21)
+          if(servoCurrData[RSF].curr>=RSF_GAIT_GNG_BACK_SLOW_BOUNDARY)
           {
             servoCurrData[RSF].curr--;
             choreo_walk_gait_derive_RSL_and_REL();
@@ -466,61 +479,12 @@ void choreo_state_walk_gait(void)
             }
           }          
         }
-        else if(servoCurrData[RSF].curr==0)
+        else if(servoCurrData[RSF].curr==RSF_GAIT_BACK_LIMIT)
         {
           zeroTo180=1;
         }
       }      
     }
-
-    /*Serial.print("servoCurrData[RSF].curr=");
-    Serial.print(servoCurrData[RSF].curr);
-    Serial.print(", servoCurrData[RSL].curr=");
-    Serial.print(servoCurrData[RSL].curr);
-    Serial.print(", servoCurrData[REL].curr=");
-    Serial.println(servoCurrData[REL].curr);
-
-    if(walkGait_SubState==1)
-    {
-      if(zeroTo180==1)
-      {
-        if(servoCurrData[RSF].curr==ARM_RSF_POS_HOME)
-        {
-          Serial.print("---- Centre Pos, Starting FWD ----");
-          Serial.println(timeCtr);
-          timeCtr=0;
-        }
-        else if(servoCurrData[RSF].curr==105)
-        {
-          Serial.print("---- Reached FWD most pos ----");
-          Serial.println(timeCtr);
-          timeCtr=0;          
-        }
-        else
-        {
-          timeCtr++;
-        }
-      }
-      if(zeroTo180==0)
-      {
-        if(servoCurrData[RSF].curr==ARM_RSF_POS_HOME)
-        {
-          Serial.print("---- Centre Pos, Starting Back ----");
-          Serial.println(timeCtr);
-          timeCtr=0;          
-        }
-        else if(servoCurrData[RSF].curr==0)
-        {
-          Serial.print("---- Reached Backward most pos ----");
-          Serial.println(timeCtr);
-          timeCtr=0;          
-        }
-        else
-        {
-          timeCtr++;
-        }        
-      }      
-    }*/
     
     UpdateServos();
   }  
