@@ -6,12 +6,13 @@
 //------------
 
 //PreProcessor - Servo Basics
-#define NOOFSERVOSARMED 6
+#define NOOFSERVOSARMED 7
 
 #define ARM_RSF_POS_HOME 43
 #define ARM_RSL_POS_HOME 159
 #define ARM_REL_POS_HOME 103
-#define ARM_LSF_POS_HOME 0
+#define ARM_LSF_POS_HOME 146
+#define ARM_LSL_POS_HOME 35
 #define ARM_NAZ_POS_HOME 90
 #define ARM_NEL_POS_HOME 90
 
@@ -19,6 +20,7 @@
 #define ARM_RSL_PIN 10
 #define ARM_REL_PIN 11
 #define ARM_LSF_PIN 2
+#define ARM_LSL_PIN 3
 #define ARM_NAZ_PIN 14
 #define ARM_NEL_PIN 15
 
@@ -51,7 +53,7 @@
 //---------------------
 
 //Structures and Tables - Servo Basics
-enum ArmServoEnum{RSF,RSL,REL,LSF,NAZ,NEL};
+enum ArmServoEnum{RSF,RSL,REL,LSF,LSL,NAZ,NEL};
 
 struct sservoConstData
 {
@@ -65,9 +67,10 @@ struct sservoConstData servoConstData[NOOFSERVOSARMED]=
   {ARM_RSF_PIN,ARM_RSF_POS_HOME,2},
   {ARM_RSL_PIN,ARM_RSL_POS_HOME,1},
   {ARM_REL_PIN,ARM_REL_POS_HOME,0},
-  {ARM_LSF_PIN,ARM_LSF_POS_HOME,3},
-  {ARM_NAZ_PIN,ARM_NAZ_POS_HOME,4},
-  {ARM_NEL_PIN,ARM_NEL_POS_HOME,5},
+  {ARM_LSF_PIN,ARM_LSF_POS_HOME,4},
+  {ARM_LSL_PIN,ARM_LSL_POS_HOME,3},
+  {ARM_NAZ_PIN,ARM_NAZ_POS_HOME,5},
+  {ARM_NEL_PIN,ARM_NEL_POS_HOME,6},
 };
 
 Servo servoHW[NOOFSERVOSARMED];
