@@ -1,5 +1,4 @@
 #include <Servo.h>
-#include <Wire.h>
 #include "AFMotor.h"
 
 //PreProcessor
@@ -123,17 +122,11 @@ int wheelsDir=0;
 //func declarations
 //-----------------
 
-void receiveEvent(int howMany);
-void requestEvent();
 void UpdateServos(void);
 
 void setup()
 { 
   Serial.begin(115200);
-
-  Wire.begin(8);
-  Wire.onReceive(receiveEvent);
-  Wire.onRequest(requestEvent);
 
   motorLeft.run(RELEASE);
   motorRight.run(RELEASE);
@@ -171,105 +164,13 @@ void loop()
   {
     if(controlMode==MANUAL)
     {
-      manualChangeFromBlynk();
+      //manualChangeFromBlynk();
     }
     else if(controlMode=CHOREOGRAPHED)
     {
       choreography(); 
     }    
   }
-}
-
-// function that executes whenever data is received from master
-void receiveEvent(int howMany)
-{
-  String rcmd = "";
-  
-  while (0 <Wire.available())
-  {
-    //char c = Wire.read();      /* receive byte as a character */
-    //Serial.print(c);           /* print the character */
-    rcmd += (char)Wire.read();
-  }
-  Serial.print("Recd Cmd:");
-  Serial.print(rcmd);
-  //Serial.print(rcmd.substring(3,4));
-  Serial.println();             /* to newline */
-
-  if(move_home_process==RANDOM_INITIAL_POS)
-  {
-    if(controlMode==MANUAL)
-    {
-      if((rcmd[0]=='m') && (rcmd[1]=='1'))
-      {  
-        move_home_process=MOVING_TO_HOME_POS;
-      }
-    }
-  }
-  else if(move_home_process==MOVED_TO_HOME_POS)
-  {
-    if((rcmd[0]=='c') && (rcmd[1]=='m') && (rcmd[2]=='m'))
-    {
-      controlMode=MANUAL;
-    }
-    else if((rcmd[0]=='c') && (rcmd[1]=='m') && (rcmd[2]=='c'))
-    {
-      controlMode=CHOREOGRAPHED;
-    }     
-    
-    if(controlMode==MANUAL)
-    {
-      if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[2]=='f'))
-      {
-        currServo=RSF;
-      }
-      else if((rcmd[0]=='r') && (rcmd[1]=='s') && (rcmd[2]=='l'))
-      {
-        currServo=RSL;
-      }
-      else if((rcmd[0]=='r') && (rcmd[1]=='e') && (rcmd[2]=='l'))
-      {
-        currServo=REL;
-      }
-      else if((rcmd[0]=='n') && (rcmd[1]=='a') && (rcmd[2]=='z'))
-      {
-        currServo=NAZ;
-      }
-      else if((rcmd[0]=='n') && (rcmd[1]=='e') && (rcmd[2]=='l'))
-      {
-        currServo=NEL;
-      }   
-      else if((rcmd[0]=='V') && (rcmd[1]=='2'))
-      {
-        if(rcmd[2]=='0')
-        {
-          servo_control_flag=0;
-        }
-        else  if(rcmd[2]=='1')
-        {
-          servo_control_flag=1;
-        }
-      }
-      else if((rcmd[0]=='V') && (rcmd[1]=='3'))
-      {
-        if(rcmd[2]=='0')
-        {
-          servo_control_flag=0;
-        }
-        else  if(rcmd[2]=='1')
-        {
-          servo_control_flag=-1;
-        }
-      }
-    }
-  }
-}
-
-void requestEvent()
-{
-  char values[26];
-  sprintf(values,"ARF%03d,L%03d,E%03d,A%03d,Z%03d",servoCurrData[RSF].curr,servoCurrData[RSL].curr,servoCurrData[REL].curr,servoCurrData[NAZ].curr,servoCurrData[NEL].curr);
-  Wire.write(values);
 }
 
 void moveHome_allServos1by1(void)
@@ -296,42 +197,6 @@ void moveHome_allServos1by1(void)
       }
     }
     delay(DELAY_BETWEEN_SERVOS_HOME_COMING);
-  }
-}
-
-void manualChangeFromBlynk(void)
-{
-  static int changeCtr=0;
-  
-  if(changeCtr++>15000)
-  {    
-    changeCtr=0;
-    
-    if(servo_control_flag==1)
-    {
-      if(currServo==RSL)
-      {
-        if(servoCurrData[currServo].curr<165)
-        {
-          servoCurrData[currServo].curr++;
-        }          
-      }
-      else
-      {
-        if(servoCurrData[currServo].curr<180)
-        {
-          servoCurrData[currServo].curr++;
-        }
-      }
-    }
-    else if(servo_control_flag==-1)
-    {
-      if(servoCurrData[currServo].curr>0)
-      {
-        servoCurrData[currServo].curr--;
-      }
-    }  
-    UpdateServos();
   }
 }
 
@@ -578,13 +443,13 @@ void choreo_state_walk_gait(void)
 
 void choreo_state_dummy(void)
 {
-  static int ctr=0;
+  /*static int ctr=0;
 
   if(ctr++>1000)
   {
     ctr=0;
     Serial.println("choreo_state_dummy");
-  }   
+  }*/   
 }
 
 void UpdateServos(void)
