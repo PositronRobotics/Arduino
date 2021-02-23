@@ -460,25 +460,25 @@ void choreo_state_walk_gait(void)
           //Right Ends
 
           //Left
-          if(servoCurrData[LSF].curr<=LSF_GAIT_GNG_FRONT_SLOW_BOUNDARY)
+          if(servoCurrData[LSF].curr<=LSF_GAIT_GNG_BACK_SLOW_BOUNDARY)
           {
-            servoCurrData[LSF].curr--;
+            servoCurrData[LSF].curr++;
             //choreo_walk_gait_derive_RSL_and_REL();
           }
           else
           {
             if(OnlyEven==0)
             {
-              servoCurrData[LSF].curr--;
+              servoCurrData[LSF].curr++;
               //choreo_walk_gait_derive_RSL_and_REL();
-              OnlyEven=1;
+              OnlyEven=1;             
             }
             else
             {
               OnlyEven=0;
             }
           }
-          //Left Ends
+          //Left Ends 
                     
         }
         else if(servoCurrData[RSF].curr==RSF_GAIT_FRONT_LIMIT)
@@ -513,25 +513,25 @@ void choreo_state_walk_gait(void)
           //Right Ends
 
           //Left
-          if(servoCurrData[LSF].curr<=LSF_GAIT_GNG_BACK_SLOW_BOUNDARY)
+          if(servoCurrData[LSF].curr<=LSF_GAIT_GNG_FRONT_SLOW_BOUNDARY)
           {
-            servoCurrData[LSF].curr++;
+            servoCurrData[LSF].curr--;
             //choreo_walk_gait_derive_RSL_and_REL();
           }
           else
           {
             if(OnlyEven==0)
             {
-              servoCurrData[LSF].curr++;
+              servoCurrData[LSF].curr--;
               //choreo_walk_gait_derive_RSL_and_REL();
-              OnlyEven=1;             
+              OnlyEven=1;
             }
             else
             {
               OnlyEven=0;
             }
           }
-          //Left Ends          
+          //Left Ends                   
 
 
         }
