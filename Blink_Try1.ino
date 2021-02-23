@@ -423,13 +423,13 @@ void choreo_walk_gait_derive_LSL_and_LEL(void)
     //  servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
     //}
   }
-  /*else
+  else
   {
-    if((servoCurrData[RSF].curr+84+((42-servoCurrData[RSF].curr)*2))<=RSL_INNER_SWING_MAX)
+    if( ( (servoCurrData[LSF].curr-79)  - ((servoCurrData[LSF].curr-138)*2) ) >=LSL_INNER_SWING_MAX)
     {
-      servoCurrData[RSL].curr=(servoCurrData[RSF].curr+84+((42-servoCurrData[RSF].curr)*2));
+      servoCurrData[LSL].curr=( (servoCurrData[LSF].curr-79)  - ((servoCurrData[LSF].curr-138)*2) );
     }
-  }*/
+  }
 }
 
 void choreo_state_walk_gait(void)
