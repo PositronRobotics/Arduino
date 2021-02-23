@@ -379,6 +379,9 @@ void choreo_state_walk_gait(void)
         else if(servoCurrData[RSF].curr==RSF_GAIT_FRONT_LIMIT)
         {
           zeroTo180=0;
+
+          motorLeft.run(FORWARD);
+          motorRight.run(FORWARD);          
         }
       }
       else
@@ -433,6 +436,9 @@ void choreo_state_walk_gait(void)
         else if(servoCurrData[RSF].curr==RSF_GAIT_BACK_LIMIT)
         {
           zeroTo180=1;
+
+          //motorLeft.run(BACKWARD);
+          //motorRight.run(BACKWARD);          
         }
       }      
     }
