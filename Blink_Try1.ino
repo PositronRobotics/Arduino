@@ -421,10 +421,10 @@ void choreo_walk_gait_derive_LSL_and_LEL(void)
     {
       servoCurrData[LSL].curr=servoCurrData[LSF].curr-77;
     }
-    //if(servoCurrData[RSL].curr>=RSL_INNER_SWING_MAX)
-    //{
-    //  servoCurrData[REL].curr=(servoCurrData[RSF].curr+20-((servoCurrData[RSF].curr-83)*2));
-    //}
+    if(servoCurrData[LSL].curr<=LSL_INNER_SWING_MAX)
+    {
+      servoCurrData[LEL].curr=(servoCurrData[LSF].curr-20+((97-servoCurrData[LSF].curr)*2));
+    }
   }
   else
   {
