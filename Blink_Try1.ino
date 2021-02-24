@@ -829,17 +829,17 @@ void choreo_state_actuation_demo(void)
           servoCurrData[LSF].curr++;
         }
 
-        if(servoCurrData[NAZ].curr<160)
-        {
-          servoCurrData[NAZ].curr++;
-        }
-
         if(servoCurrData[NEL].curr>150)
         {
           servoCurrData[NEL].curr--;
+        }        
+
+        if(servoCurrData[NAZ].curr<160)
+        {
+          servoCurrData[NAZ].curr++;
         }                
 
-        if((servoCurrData[LSF].curr==ARM_LSF_POS_HOME) && (servoCurrData[NEL].curr==160) && (servoCurrData[NAZ].curr==150))
+        if((servoCurrData[LSF].curr==ARM_LSF_POS_HOME) && (servoCurrData[NEL].curr==150) && (servoCurrData[NAZ].curr==160))
         {
           substate2_sub1=13;
         }                       
@@ -851,11 +851,40 @@ void choreo_state_actuation_demo(void)
           servoCurrData[LSL].curr++;
         }
 
-        if(servoCurrData[LSL].curr==ARM_LSL_POS_HOME)
+        if(servoCurrData[LSL].curr==120)
         {
           substate2_sub1=14;
         }                       
-      }                                                                      
+      }
+      else if(substate2_sub1==14)
+      {
+        if(servoCurrData[LSL].curr>ARM_LSL_POS_HOME)
+        {
+          servoCurrData[LSL].curr--;
+        }
+
+        if(servoCurrData[LSL].curr==ARM_LSL_POS_HOME)
+        {
+          substate2_sub1=15;
+        }                       
+      }
+      else if(substate2_sub1==15)
+      {
+        if(servoCurrData[NEL].curr>90)
+        {
+          servoCurrData[NEL].curr--;
+        }
+        
+        if(servoCurrData[NAZ].curr>90)
+        {
+          servoCurrData[NAZ].curr--;
+        }
+
+        if((servoCurrData[NEL].curr==90) && (servoCurrData[NAZ].curr==90))
+        {
+          substate2_sub1=16;
+        }                             
+      }                                                                                  
     }
     
     UpdateServos();
