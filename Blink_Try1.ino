@@ -39,7 +39,7 @@
 #define MANUAL 0
 #define CHOREOGRAPHED 1
 
-#define NOOFCHOREOSTATES 4
+#define NOOFCHOREOSTATES 2
 
 #define CHOREO_STATE_IDLE 999
 
@@ -103,8 +103,8 @@ void choreo_state_actuation_demo(void);
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_WAIT,NULL,1},
-  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
-  {CHOREO_STATE_WAIT,NULL,1},
+  //{CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
+  //{CHOREO_STATE_WAIT,NULL,1},
   {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,30},
 };
 
@@ -539,22 +539,25 @@ void choreo_state_walk_gait(void)
 
 #define NAZ_LEFT_MOST 180
 #define NAZ_RIGHT_MOST 0
-#define NEL_TOP_MOST 0
-#define NEL_BOTTOM_MOST 180
+#define NEL_TOP_MOST 30
+#define NEL_BOTTOM_MOST 165
 
 
 void choreo_state_actuation_demo(void)
 {
   static long actuation_demo_driveMotorctr=0;
   
-  static int ActuationDemo_SubState=0;
+  static int ActuationDemo_SubState1=0;
+  static int ActuationDemo_SubState2=0;
+  
   static int substate0_NAZ_LeftToRight=999;
+  static int substate0_NEL_TopToBottom=999;
 
-  if(actuation_demo_driveMotorctr++>=2500)
+  if(actuation_demo_driveMotorctr++>=1500)
   {
     actuation_demo_driveMotorctr=0;
     
-    if(ActuationDemo_SubState==0)
+    if(ActuationDemo_SubState1==0)
     {
       if(substate0_NAZ_LeftToRight==999)
       {
@@ -593,11 +596,56 @@ void choreo_state_actuation_demo(void)
           else if(servoCurrData[NAZ].curr==90)
           {
             substate0_NAZ_LeftToRight=0;
-            ActuationDemo_SubState=1;
+            ActuationDemo_SubState1=1;
           }                    
         }        
       }
     }
+    else if(ActuationDemo_SubState1==1)
+    {
+      if(substate0_NEL_TopToBottom==999)
+      {
+        substate0_NEL_TopToBottom=1;
+      }
+      else
+      {
+        if(substate0_NEL_TopToBottom==1)
+        {
+          if(servoCurrData[NEL].curr>NEL_TOP_MOST)
+          {
+            servoCurrData[NEL].curr--;
+          }
+          else if(servoCurrData[NEL].curr==NEL_TOP_MOST)
+          {
+            substate0_NEL_TopToBottom=2;
+          }
+        }
+        else if(substate0_NEL_TopToBottom==2)
+        {
+          if(servoCurrData[NEL].curr<NEL_BOTTOM_MOST)
+          {
+            servoCurrData[NEL].curr++;
+          }
+          else if(servoCurrData[NEL].curr==NEL_BOTTOM_MOST)
+          {
+            substate0_NEL_TopToBottom=3;
+          }                    
+        }
+        else if(substate0_NEL_TopToBottom==3)
+        {
+          if(servoCurrData[NEL].curr>90)
+          {
+            servoCurrData[NEL].curr--;
+          }
+          else if(servoCurrData[NEL].curr==90)
+          {
+            substate0_NEL_TopToBottom=0;
+            ActuationDemo_SubState1=1;
+          }                    
+        }        
+      }      
+    }
+    
     UpdateServos();
   }
 }
