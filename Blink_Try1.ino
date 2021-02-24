@@ -746,7 +746,70 @@ void choreo_state_actuation_demo(void)
         {
           substate2_sub1=7;
         }                       
-      }                             
+      } 
+      else if(substate2_sub1==7)
+      {
+        if(servoCurrData[LSF].curr>0)
+        {
+          servoCurrData[LSF].curr--;
+        }
+
+        if(servoCurrData[LSF].curr==0)
+        {
+          substate2_sub1=8;
+        }                       
+      }
+      else if(substate2_sub1==8)
+      {
+        if(servoCurrData[NEL].curr>75)
+        {
+          servoCurrData[NEL].curr--;
+        }
+        
+        if(servoCurrData[NAZ].curr<150)
+        {
+          servoCurrData[NAZ].curr++;
+        }
+
+        if((servoCurrData[NEL].curr==75) && (servoCurrData[NAZ].curr==150))
+        {
+          substate2_sub1=9;
+        }                       
+      }
+      else if(substate2_sub1==9)
+      {
+        if(servoCurrData[LSF].curr<80)
+        {
+          servoCurrData[LSF].curr++;
+        }
+
+        if(servoCurrData[NEL].curr<35)
+        {
+          servoCurrData[NEL].curr++;
+        }
+        
+        if(servoCurrData[NAZ].curr>150)
+        {
+          servoCurrData[NAZ].curr--;
+        }        
+
+        if((servoCurrData[LSF].curr==80) && (servoCurrData[NEL].curr==35) && (servoCurrData[NAZ].curr==150))
+        {
+          substate2_sub1=10;
+        }                       
+      }
+      else if(substate2_sub1==10)
+      {
+        if(servoCurrData[LEL].curr<120)
+        {
+          servoCurrData[LEL].curr++;
+        }
+
+        if(servoCurrData[LEL].curr==120)
+        {
+          substate2_sub1=11;
+        }                       
+      }                                                    
     }
     
     UpdateServos();
