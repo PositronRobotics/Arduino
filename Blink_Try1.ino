@@ -105,7 +105,7 @@ struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
   {CHOREO_STATE_WAIT,NULL,1},
   //{CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
   //{CHOREO_STATE_WAIT,NULL,1},
-  {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,30},
+  {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,100},
 };
 
 //Variables
@@ -362,7 +362,7 @@ void choreo_state_walk_gait(void)
 
   if(driveMotorctr++>=3000)
   {
-    Serial.println("choreo_state_walk_gait()");
+    //Serial.println("choreo_state_walk_gait()");
     
     driveMotorctr=0;
 
@@ -696,16 +696,57 @@ void choreo_state_actuation_demo(void)
       }
       else if(substate2_sub1==3)
       {
-        if(servoCurrData[REL].curr>30)
+        if(servoCurrData[REL].curr>20)
         {
           servoCurrData[REL].curr--;
         }
 
-        if(servoCurrData[REL].curr==30)
+        if(servoCurrData[REL].curr==20)
         {
           substate2_sub1=4;
         }                       
-      }            
+      }
+      else if(substate2_sub1==4)
+      {
+        if(servoCurrData[REL].curr<ARM_REL_POS_HOME)
+        {
+          servoCurrData[REL].curr++;
+        }
+
+        if(servoCurrData[REL].curr==ARM_REL_POS_HOME)
+        {
+          substate2_sub1=5;
+        }                       
+      }
+      else if(substate2_sub1==5)
+      {
+        if(servoCurrData[RSL].curr>ARM_RSL_POS_HOME)
+        {
+          servoCurrData[RSL].curr--;
+        }
+
+        if(servoCurrData[RSL].curr==ARM_RSL_POS_HOME)
+        {
+          substate2_sub1=6;
+        }                       
+      }
+      else if(substate2_sub1==6)
+      {
+        if(servoCurrData[RSF].curr>ARM_RSF_POS_HOME)
+        {
+          servoCurrData[RSF].curr--;
+        }
+
+        if(servoCurrData[NEL].curr<NEL_BOTTOM_MOST)
+        {
+          servoCurrData[NEL].curr++;
+        }
+
+        if((servoCurrData[RSF].curr==ARM_RSF_POS_HOME) && (servoCurrData[NEL].curr==NEL_BOTTOM_MOST))
+        {
+          substate2_sub1=7;
+        }                       
+      }                             
     }
     
     UpdateServos();
