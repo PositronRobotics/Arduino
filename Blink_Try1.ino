@@ -39,11 +39,11 @@
 #define MANUAL 0
 #define CHOREOGRAPHED 1
 
-#define NOOFCHOREOSTATES 3
+#define NOOFCHOREOSTATES 4
 
 #define CHOREO_STATE_IDLE 999
 
-#define CHOREO_STATE_INITAL_WAIT 0
+#define CHOREO_STATE_WAIT 0
 #define CHOREO_STATE_WALK_GAIT 1
 #define CHOREO_STATE_DUMMY 2
 
@@ -102,8 +102,9 @@ void choreo_state_actuation_demo(void);
 
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
-  {CHOREO_STATE_INITAL_WAIT,NULL,1},
+  {CHOREO_STATE_WAIT,NULL,1},
   {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
+  {CHOREO_STATE_WAIT,NULL,1},
   {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,30},
 };
 
@@ -571,33 +572,32 @@ void choreo_state_actuation_demo(void)
           {
             substate0_NAZ_LeftToRight=2;
           }
-          else if(substate0_NAZ_LeftToRight==2)
-          {
-            if(servoCurrData[NAZ].curr<NAZ_LEFT_MOST)
-            {
-              servoCurrData[NAZ].curr++;
-            }
-            else if(servoCurrData[NAZ].curr==NAZ_LEFT_MOST)
-            {
-              substate0_NAZ_LeftToRight=3;
-            }                    
-          }
-          else if(substate0_NAZ_LeftToRight==3)
-          {
-            if(servoCurrData[NAZ].curr>90)
-            {
-              servoCurrData[NAZ].curr--;
-            }
-            else if(servoCurrData[NAZ].curr==90)
-            {
-              substate0_NAZ_LeftToRight=0;
-              ActuationDemo_SubState=1;
-            }                    
-          }        
         }
+        else if(substate0_NAZ_LeftToRight==2)
+        {
+          if(servoCurrData[NAZ].curr<NAZ_LEFT_MOST)
+          {
+            servoCurrData[NAZ].curr++;
+          }
+          else if(servoCurrData[NAZ].curr==NAZ_LEFT_MOST)
+          {
+            substate0_NAZ_LeftToRight=3;
+          }                    
+        }
+        else if(substate0_NAZ_LeftToRight==3)
+        {
+          if(servoCurrData[NAZ].curr>90)
+          {
+            servoCurrData[NAZ].curr--;
+          }
+          else if(servoCurrData[NAZ].curr==90)
+          {
+            substate0_NAZ_LeftToRight=0;
+            ActuationDemo_SubState=1;
+          }                    
+        }        
       }
     }
-
     UpdateServos();
   }
 }
