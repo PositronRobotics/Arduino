@@ -823,7 +823,7 @@ void choreo_state_actuation_demo(void)
         }                       
       }
       else if(substate2_sub1==12)
-      {
+      {        
         if(servoCurrData[LSF].curr<ARM_LSF_POS_HOME)
         {
           servoCurrData[LSF].curr++;
@@ -837,9 +837,16 @@ void choreo_state_actuation_demo(void)
         if(servoCurrData[NAZ].curr<160)
         {
           servoCurrData[NAZ].curr++;
-        }                
+        }
 
-        if((servoCurrData[LSF].curr==ARM_LSF_POS_HOME) && (servoCurrData[NEL].curr==150) && (servoCurrData[NAZ].curr==160))
+        Serial.print("servoCurrData[LSF].curr=");
+        Serial.print(servoCurrData[LSF].curr);
+        Serial.print(", servoCurrData[NEL].curr=");
+        Serial.print(servoCurrData[NEL].curr);
+        Serial.print(", servoCurrData[NAZ].curr=");
+        Serial.println(servoCurrData[NAZ].curr);
+
+        if((servoCurrData[LSF].curr==ARM_LSF_POS_HOME) && (servoCurrData[NEL].curr==125) && (servoCurrData[NAZ].curr==160))
         {
           substate2_sub1=13;
         }                       
