@@ -50,6 +50,10 @@
 //PreProcessor - Vehicle
 #define WHEEL_SPEED_HIGH 255
 
+#define NORMAL_RUNNING_TIME_OF_STATE 0
+#define STOP_GIVEN_FROM_STATE_MACHINE 1
+#define PROCEDURE_GAVE_GO_AHEAD_TO_STOP 2
+
 //Structures and Tables
 //---------------------
 
@@ -200,6 +204,8 @@ void moveHome_allServos1by1(void)
   }
 }
 
+int StateEndProcess=NORMAL_RUNNING_TIME_OF_STATE;
+
 void choreography(void)
 {
   static int choreo_state_cur=0;
@@ -208,28 +214,61 @@ void choreography(void)
   static int choreoSeconds=0;  
 
   if(choreo_state_cur<NOOFCHOREOSTATES)
-  {    
-    if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
+  {
+    //Serial.println("choreography1");
+    if(StateEndProcess==NORMAL_RUNNING_TIME_OF_STATE)
     {
+      //Serial.println("choreography2");
+      if(choreoSeconds<=choreoTable[choreo_state_cur].duration)
+      {
+        //Serial.println("choreography3");
+        if(choreoTable[choreo_state_cur].proc!=NULL)
+        {
+          //Serial.println("choreography4");
+          choreoTable[choreo_state_cur].proc();
+        }  
+        
+        if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
+        {
+          Serial.println("choreography5");
+          choreo1SecondCtr=0;
+          choreoSeconds++;
+        }   
+      }
+      else
+      {
+        Serial.println("choreography6"); 
+        if(choreoTable[choreo_state_cur].proc!=NULL)
+        {
+          Serial.println("choreography7");
+          choreoTable[choreo_state_cur].proc();
+          StateEndProcess=STOP_GIVEN_FROM_STATE_MACHINE;
+        }
+        else
+        {
+          Serial.println("choreography8");
+          StateEndProcess=PROCEDURE_GAVE_GO_AHEAD_TO_STOP;
+        }
+      }
+    }
+    else if(StateEndProcess==STOP_GIVEN_FROM_STATE_MACHINE)
+    {
+      Serial.println("choreography9");        
       if(choreoTable[choreo_state_cur].proc!=NULL)
       {
+        Serial.println("choreography10");
         choreoTable[choreo_state_cur].proc();
-      }  
-      
-      if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
-      {
-        choreo1SecondCtr=0;
-        choreoSeconds++;
-      }   
-    }
-    else
+      }      
+    }     
+    else if(StateEndProcess==PROCEDURE_GAVE_GO_AHEAD_TO_STOP)
     {
+      Serial.println("choreography11");
+      StateEndProcess=NORMAL_RUNNING_TIME_OF_STATE;
+            
       choreo1SecondCtr=0;
       choreoSeconds=0;
-      choreo_state_cur++;
-      //Serial.print("Else - choreoSeconds"); 
-      //Serial.println(choreoSeconds);      
-    }
+      choreo_state_cur++;        
+    }       
   }
 }
 
@@ -313,6 +352,8 @@ void choreo_state_walk_gait(void)
 
   if(driveMotorctr++>=3000)
   {
+    Serial.println("choreo_state_walk_gait()");
+    
     driveMotorctr=0;
 
     if(walkGait_SubState==0)
@@ -449,13 +490,13 @@ void choreo_state_walk_gait(void)
 
 void choreo_state_dummy(void)
 {
-  /*static int ctr=0;
+  static int ctr=0;
 
   if(ctr++>1000)
   {
     ctr=0;
     Serial.println("choreo_state_dummy");
-  }*/   
+  }   
 }
 
 void UpdateServos(void)
