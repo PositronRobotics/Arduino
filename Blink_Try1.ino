@@ -98,13 +98,13 @@ struct schoreoTable
 };
 
 void choreo_state_walk_gait(void);
-void choreo_state_dummy(void);
+void choreo_state_actuation_demo(void);
 
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_INITAL_WAIT,NULL,2},
   {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,7},
-  {CHOREO_STATE_DUMMY,choreo_state_dummy,3},
+  {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,3},
 };
 
 //Variables
@@ -353,6 +353,9 @@ void choreo_state_walk_gait(void)
 
   static int OnlyEven=0;
 
+  static int GaitMotorActivated=0;
+  static int GaitMotorStopped=0;  
+
   int servoTraverse=0;
   int walkGait_SubState_3_in_Progress=0;
 
@@ -427,8 +430,13 @@ void choreo_state_walk_gait(void)
         {
           zeroTo180=0;
 
-          motorLeft.run(GO_FWD);
-          motorRight.run(GO_FWD);          
+          if(GaitMotorActivated==0)
+          {
+            motorLeft.run(GO_FWD);
+            motorRight.run(GO_FWD);
+
+            GaitMotorActivated=1;
+          }          
         }
       }
       else
@@ -480,10 +488,7 @@ void choreo_state_walk_gait(void)
         }
         else if(servoCurrData[RSF].curr==RSF_GAIT_BACK_LIMIT)
         {
-          zeroTo180=1;
-
-          //motorLeft.run(BACKWARD);
-          //motorRight.run(BACKWARD);          
+          zeroTo180=1;         
         }
       }
 
@@ -515,6 +520,14 @@ void choreo_state_walk_gait(void)
 
       if(walkGait_SubState_3_in_Progress==0)
       {
+        if(GaitMotorStopped==0)
+        {
+          motorLeft.run(RELEASE);
+          motorRight.run(RELEASE);
+      
+          GaitMotorStopped=1;
+        }         
+        
         StateEndProcess=PROCEDURE_GAVE_GO_AHEAD_TO_STOP;
       }
     }
@@ -523,18 +536,15 @@ void choreo_state_walk_gait(void)
   }  
 }
 
-void choreo_state_dummy(void)
+void choreo_state_actuation_demo(void)
 {
   static int ctr=0;
 
   if(ctr++>1000)
   {
     ctr=0;
-    Serial.println("choreo_state_dummy");
-  }
-
-  motorLeft.run(RELEASE);
-  motorRight.run(RELEASE);      
+    Serial.println("choreo_state_actuation_demo");
+  }    
 }
 
 void UpdateServos(void)
