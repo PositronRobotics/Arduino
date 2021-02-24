@@ -720,9 +720,9 @@ void choreo_state_actuation_demo(void)
       }
       else if(substate2_sub1==5)
       {
-        if(servoCurrData[RSL].curr>ARM_RSL_POS_HOME)
+        if(servoCurrData[RSL].curr<ARM_RSL_POS_HOME)
         {
-          servoCurrData[RSL].curr--;
+          servoCurrData[RSL].curr++;
         }
 
         if(servoCurrData[RSL].curr==ARM_RSL_POS_HOME)
