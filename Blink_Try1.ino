@@ -783,17 +783,17 @@ void choreo_state_actuation_demo(void)
           servoCurrData[LSF].curr++;
         }
 
-        if(servoCurrData[NEL].curr<35)
+        if(servoCurrData[NEL].curr<125)
         {
           servoCurrData[NEL].curr++;
         }
         
-        if(servoCurrData[NAZ].curr>150)
+        if(servoCurrData[NAZ].curr>120)
         {
           servoCurrData[NAZ].curr--;
         }        
 
-        if((servoCurrData[LSF].curr==80) && (servoCurrData[NEL].curr==35) && (servoCurrData[NAZ].curr==150))
+        if((servoCurrData[LSF].curr==80) && (servoCurrData[NEL].curr==125) && (servoCurrData[NAZ].curr==120))
         {
           substate2_sub1=10;
         }                       
@@ -809,7 +809,53 @@ void choreo_state_actuation_demo(void)
         {
           substate2_sub1=11;
         }                       
-      }                                                    
+      }
+      else if(substate2_sub1==11)
+      {
+        if(servoCurrData[LEL].curr>ARM_LEL_POS_HOME)
+        {
+          servoCurrData[LEL].curr--;
+        }
+
+        if(servoCurrData[LEL].curr==ARM_LEL_POS_HOME)
+        {
+          substate2_sub1=12;
+        }                       
+      }
+      else if(substate2_sub1==12)
+      {
+        if(servoCurrData[LSF].curr<ARM_LSF_POS_HOME)
+        {
+          servoCurrData[LSF].curr++;
+        }
+
+        if(servoCurrData[NAZ].curr<160)
+        {
+          servoCurrData[NAZ].curr++;
+        }
+
+        if(servoCurrData[NEL].curr>150)
+        {
+          servoCurrData[NEL].curr--;
+        }                
+
+        if((servoCurrData[LSF].curr==ARM_LSF_POS_HOME) && (servoCurrData[NEL].curr==160) && (servoCurrData[NAZ].curr==150))
+        {
+          substate2_sub1=13;
+        }                       
+      }
+      else if(substate2_sub1==13)
+      {
+        if(servoCurrData[LSL].curr<120)
+        {
+          servoCurrData[LSL].curr++;
+        }
+
+        if(servoCurrData[LSL].curr==ARM_LSL_POS_HOME)
+        {
+          substate2_sub1=14;
+        }                       
+      }                                                                      
     }
     
     UpdateServos();
