@@ -12,7 +12,7 @@
 #define ARM_REL_POS_HOME 103
 #define ARM_LSF_POS_HOME 137
 #define ARM_LSL_POS_HOME 26
-#define ARM_LEL_POS_HOME 77
+#define ARM_LEL_POS_HOME 75
 #define ARM_NAZ_POS_HOME 90
 #define ARM_NEL_POS_HOME 90
 
@@ -350,6 +350,9 @@ void choreo_state_walk_gait(void)
 
   static int OnlyEven=0;
 
+  int servoTraverse=0;
+  int walkGait_SubState_3_in_Progress=0;
+
   if(driveMotorctr++>=3000)
   {
     Serial.println("choreo_state_walk_gait()");
@@ -421,8 +424,8 @@ void choreo_state_walk_gait(void)
         {
           zeroTo180=0;
 
-          motorLeft.run(FORWARD);
-          motorRight.run(FORWARD);          
+          motorLeft.run(BACKWARD);
+          motorRight.run(BACKWARD);          
         }
       }
       else
@@ -491,12 +494,23 @@ void choreo_state_walk_gait(void)
     }
     else if(walkGait_SubState==2)
     {
-      if(servoCurrData[RSL].curr<ARM_RSL_POS_HOME)
-      {
-        servoCurrData[RSL].curr++;
-        servoCurrData[LSL].curr--;
+      walkGait_SubState_3_in_Progress=0;
+      
+      for(int servoTraverse=0;servoTraverse<NOOFSERVOSARMED;servoTraverse++)
+      {              
+        if(servoCurrData[servoTraverse].curr>servoConstData[servoTraverse].initialPos)
+        {
+          servoCurrData[servoTraverse].curr--;
+          walkGait_SubState_3_in_Progress=1;
+        }
+        if(servoCurrData[servoTraverse].curr<servoConstData[servoTraverse].initialPos)
+        {
+          servoCurrData[servoTraverse].curr++;
+          walkGait_SubState_3_in_Progress=1;
+        }
       }
-      else
+
+      if(walkGait_SubState_3_in_Progress==0)
       {
         StateEndProcess=PROCEDURE_GAVE_GO_AHEAD_TO_STOP;
       }
@@ -514,7 +528,10 @@ void choreo_state_dummy(void)
   {
     ctr=0;
     Serial.println("choreo_state_dummy");
-  }   
+  }
+
+  motorLeft.run(RELEASE);
+  motorRight.run(RELEASE);      
 }
 
 void UpdateServos(void)
