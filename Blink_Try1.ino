@@ -103,7 +103,7 @@ void choreo_state_dummy(void);
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_INITAL_WAIT,NULL,2},
-  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,20},
+  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,7},
   {CHOREO_STATE_DUMMY,choreo_state_dummy,3},
 };
 
@@ -230,39 +230,39 @@ void choreography(void)
         
         if(choreo1SecondCtr++>COUNT_FOR_A_SECOND)
         {
-          Serial.println("choreography5");
+          //Serial.println("choreography5");
           choreo1SecondCtr=0;
           choreoSeconds++;
         }   
       }
       else
       {
-        Serial.println("choreography6"); 
+        //Serial.println("choreography6"); 
         if(choreoTable[choreo_state_cur].proc!=NULL)
         {
-          Serial.println("choreography7");
+          //Serial.println("choreography7");
           choreoTable[choreo_state_cur].proc();
           StateEndProcess=STOP_GIVEN_FROM_STATE_MACHINE;
         }
         else
         {
-          Serial.println("choreography8");
+          //Serial.println("choreography8");
           StateEndProcess=PROCEDURE_GAVE_GO_AHEAD_TO_STOP;
         }
       }
     }
     else if(StateEndProcess==STOP_GIVEN_FROM_STATE_MACHINE)
     {
-      Serial.println("choreography9");        
+      //Serial.println("choreography9");        
       if(choreoTable[choreo_state_cur].proc!=NULL)
       {
-        Serial.println("choreography10");
+        //Serial.println("choreography10");
         choreoTable[choreo_state_cur].proc();
       }      
     }     
     else if(StateEndProcess==PROCEDURE_GAVE_GO_AHEAD_TO_STOP)
     {
-      Serial.println("choreography11");
+      //Serial.println("choreography11");
       StateEndProcess=NORMAL_RUNNING_TIME_OF_STATE;
             
       choreo1SecondCtr=0;
@@ -470,9 +470,7 @@ void choreo_state_walk_gait(void)
               OnlyEven=0;
             }
           }
-          //Left Ends                   
-
-
+          //Left Ends
         }
         else if(servoCurrData[RSF].curr==RSF_GAIT_BACK_LIMIT)
         {
@@ -481,7 +479,27 @@ void choreo_state_walk_gait(void)
           //motorLeft.run(BACKWARD);
           //motorRight.run(BACKWARD);          
         }
-      }      
+      }
+
+      if(StateEndProcess==STOP_GIVEN_FROM_STATE_MACHINE)
+      {
+        if(servoCurrData[RSF].curr==ARM_RSF_POS_HOME)
+        {
+          walkGait_SubState=2;
+        }
+      }
+    }
+    else if(walkGait_SubState==2)
+    {
+      if(servoCurrData[RSL].curr<ARM_RSL_POS_HOME)
+      {
+        servoCurrData[RSL].curr++;
+        servoCurrData[LSL].curr--;
+      }
+      else
+      {
+        StateEndProcess=PROCEDURE_GAVE_GO_AHEAD_TO_STOP;
+      }
     }
     
     UpdateServos();
