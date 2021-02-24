@@ -547,17 +547,18 @@ void choreo_state_actuation_demo(void)
 {
   static long actuation_demo_driveMotorctr=0;
   
-  static int ActuationDemo_SubState1=0;
-  static int ActuationDemo_SubState2=0;
+  static int ActuationDemo_SubState=0;
   
   static int substate0_NAZ_LeftToRight=999;
-  static int substate0_NEL_TopToBottom=999;
+  static int substate1_NEL_TopToBottom=999;
+
+  static int substate2_sub1=0;
 
   if(actuation_demo_driveMotorctr++>=1500)
   {
     actuation_demo_driveMotorctr=0;
     
-    if(ActuationDemo_SubState1==0)
+    if(ActuationDemo_SubState==0)
     {
       if(substate0_NAZ_LeftToRight==999)
       {
@@ -596,20 +597,20 @@ void choreo_state_actuation_demo(void)
           else if(servoCurrData[NAZ].curr==90)
           {
             substate0_NAZ_LeftToRight=0;
-            ActuationDemo_SubState1=1;
+            ActuationDemo_SubState=1;
           }                    
         }        
       }
     }
-    else if(ActuationDemo_SubState1==1)
+    else if(ActuationDemo_SubState==1)
     {
-      if(substate0_NEL_TopToBottom==999)
+      if(substate1_NEL_TopToBottom==999)
       {
-        substate0_NEL_TopToBottom=1;
+        substate1_NEL_TopToBottom=1;
       }
       else
       {
-        if(substate0_NEL_TopToBottom==1)
+        if(substate1_NEL_TopToBottom==1)
         {
           if(servoCurrData[NEL].curr>NEL_TOP_MOST)
           {
@@ -617,10 +618,10 @@ void choreo_state_actuation_demo(void)
           }
           else if(servoCurrData[NEL].curr==NEL_TOP_MOST)
           {
-            substate0_NEL_TopToBottom=2;
+            substate1_NEL_TopToBottom=2;
           }
         }
-        else if(substate0_NEL_TopToBottom==2)
+        else if(substate1_NEL_TopToBottom==2)
         {
           if(servoCurrData[NEL].curr<NEL_BOTTOM_MOST)
           {
@@ -628,10 +629,10 @@ void choreo_state_actuation_demo(void)
           }
           else if(servoCurrData[NEL].curr==NEL_BOTTOM_MOST)
           {
-            substate0_NEL_TopToBottom=3;
+            substate1_NEL_TopToBottom=3;
           }                    
         }
-        else if(substate0_NEL_TopToBottom==3)
+        else if(substate1_NEL_TopToBottom==3)
         {
           if(servoCurrData[NEL].curr>90)
           {
@@ -639,11 +640,72 @@ void choreo_state_actuation_demo(void)
           }
           else if(servoCurrData[NEL].curr==90)
           {
-            substate0_NEL_TopToBottom=0;
-            ActuationDemo_SubState1=1;
+            substate1_NEL_TopToBottom=0;
+            ActuationDemo_SubState=2;
           }                    
         }        
       }      
+    }
+    else if(ActuationDemo_SubState==2)
+    {
+      if(substate2_sub1==0)
+      {
+        if(servoCurrData[NEL].curr<NEL_BOTTOM_MOST)
+        {
+          servoCurrData[NEL].curr++;
+        }
+        
+        if(servoCurrData[NAZ].curr>35)
+        {
+          servoCurrData[NAZ].curr--;
+        }
+
+        if((servoCurrData[NEL].curr==NEL_BOTTOM_MOST) && (servoCurrData[NAZ].curr==35))
+        {
+          substate2_sub1=1;
+        }
+      }
+      else if(substate2_sub1==1)
+      {
+        if(servoCurrData[RSF].curr<160)
+        {
+          servoCurrData[RSF].curr++;
+        }
+        
+        if(servoCurrData[NEL].curr>117)
+        {
+          servoCurrData[NEL].curr--;
+        }
+
+        if((servoCurrData[RSF].curr==160) && (servoCurrData[NEL].curr==117))
+        {
+          substate2_sub1=2;
+        }                       
+      }
+      else if(substate2_sub1==2)
+      {
+        if(servoCurrData[RSL].curr>90)
+        {
+          servoCurrData[RSL].curr--;
+        }
+
+        if(servoCurrData[RSL].curr==90)
+        {
+          substate2_sub1=3;
+        }                       
+      }
+      else if(substate2_sub1==3)
+      {
+        if(servoCurrData[REL].curr>30)
+        {
+          servoCurrData[REL].curr--;
+        }
+
+        if(servoCurrData[REL].curr==30)
+        {
+          substate2_sub1=4;
+        }                       
+      }            
     }
     
     UpdateServos();
