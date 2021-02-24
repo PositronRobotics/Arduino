@@ -339,6 +339,9 @@ void choreo_walk_gait_derive_LSL_and_LEL(void)
   }
 }
 
+#define GO_FWD BACKWARD //Since ther + and - are interchanged.
+#define GO_BACK FORWARD //Since ther + and - are interchanged.
+
 void choreo_state_walk_gait(void)
 { 
   static int zeroTo180=1;
@@ -424,8 +427,8 @@ void choreo_state_walk_gait(void)
         {
           zeroTo180=0;
 
-          motorLeft.run(BACKWARD);
-          motorRight.run(BACKWARD);          
+          motorLeft.run(GO_FWD);
+          motorRight.run(GO_FWD);          
         }
       }
       else
