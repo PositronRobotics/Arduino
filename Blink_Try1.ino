@@ -39,7 +39,7 @@
 #define MANUAL 0
 #define CHOREOGRAPHED 1
 
-#define NOOFCHOREOSTATES 2
+#define NOOFCHOREOSTATES 4
 
 #define CHOREO_STATE_IDLE 999
 
@@ -103,8 +103,8 @@ void choreo_state_actuation_demo(void);
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_WAIT,NULL,1},
-  //{CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,4},
-  //{CHOREO_STATE_WAIT,NULL,1},
+  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,8},
+  {CHOREO_STATE_WAIT,NULL,1},
   {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,100},
 };
 
@@ -838,13 +838,6 @@ void choreo_state_actuation_demo(void)
         {
           servoCurrData[NAZ].curr++;
         }
-
-        Serial.print("servoCurrData[LSF].curr=");
-        Serial.print(servoCurrData[LSF].curr);
-        Serial.print(", servoCurrData[NEL].curr=");
-        Serial.print(servoCurrData[NEL].curr);
-        Serial.print(", servoCurrData[NAZ].curr=");
-        Serial.println(servoCurrData[NAZ].curr);
 
         if((servoCurrData[LSF].curr==ARM_LSF_POS_HOME) && (servoCurrData[NEL].curr==125) && (servoCurrData[NAZ].curr==160))
         {
