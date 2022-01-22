@@ -39,7 +39,7 @@
 #define MANUAL 0
 #define CHOREOGRAPHED 1
 
-#define NOOFCHOREOSTATES 4
+#define NOOFCHOREOSTATES 3
 
 #define CHOREO_STATE_IDLE 999
 
@@ -103,7 +103,7 @@ void choreo_state_actuation_demo(void);
 struct schoreoTable choreoTable[NOOFCHOREOSTATES]=
 {
   {CHOREO_STATE_WAIT,NULL,1},
-  {CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,8},
+  //{CHOREO_STATE_WALK_GAIT,choreo_state_walk_gait,8},
   {CHOREO_STATE_WAIT,NULL,1},
   {CHOREO_STATE_DUMMY,choreo_state_actuation_demo,100},
 };
@@ -537,7 +537,6 @@ void choreo_state_walk_gait(void)
 #define NEL_TOP_MOST 30
 #define NEL_BOTTOM_MOST 165
 
-
 void choreo_state_actuation_demo(void)
 {
   static long actuation_demo_driveMotorctr=0;
@@ -548,12 +547,125 @@ void choreo_state_actuation_demo(void)
   static int substate1_NEL_TopToBottom=999;
 
   static int substate2_sub1=0;
+  
+  //
+  #define RSF_RAISE_LIMIT_POSITVE 180
+  static int RSF_Raise_Or_Lower_Positive=1;
+  
+  #define RSL_RAISE_LIMIT_NEGATIVE 90
+  static int RSL_Raise_Or_Lower_Negative=1;  
+  
+  #define LSF_RAISE_LIMIT_NEGATIVE 0
+  static int LSF_Raise_Or_Lower_Negative=1; 
 
-  if(actuation_demo_driveMotorctr++>=1500)
+  #define LSL_RAISE_LIMIT_POSITIVE 95
+  static int LSL_Raise_Or_Lower_Positive=1;  
+  //
+
+  if(actuation_demo_driveMotorctr++>=2500)
   {
     actuation_demo_driveMotorctr=0;
     
-    if(ActuationDemo_SubState==0)
+	if(RSF_Raise_Or_Lower_Positive==1)
+	{
+		if(servoCurrData[RSF].curr<RSF_RAISE_LIMIT_POSITVE)
+		{
+			servoCurrData[RSF].curr++;
+		}
+		else if(servoCurrData[RSF].curr==RSF_RAISE_LIMIT_POSITVE)
+		{
+			RSF_Raise_Or_Lower_Positive=0;
+		}
+	}
+	else if(RSF_Raise_Or_Lower_Positive==0)
+	{
+		if(servoCurrData[RSF].curr>ARM_RSF_POS_HOME)
+		{
+		  servoCurrData[RSF].curr--;
+		}
+		else if(servoCurrData[RSF].curr==ARM_RSF_POS_HOME)
+		{
+			RSF_Raise_Or_Lower_Positive=1;
+		}
+	}
+	
+	
+
+	if(RSL_Raise_Or_Lower_Negative==1)
+	{
+		if(servoCurrData[RSL].curr>RSL_RAISE_LIMIT_NEGATIVE)
+		{
+			servoCurrData[RSL].curr--;
+		}
+		else if(servoCurrData[RSL].curr==RSL_RAISE_LIMIT_NEGATIVE)
+		{
+			RSL_Raise_Or_Lower_Negative=0;
+		}
+	}
+	else if(RSL_Raise_Or_Lower_Negative==0)
+	{
+		if(servoCurrData[RSL].curr<ARM_RSL_POS_HOME)
+		{
+		  servoCurrData[RSL].curr++;
+		}
+		else if(servoCurrData[RSL].curr==ARM_RSL_POS_HOME)
+		{
+			RSL_Raise_Or_Lower_Negative=1;
+		}
+	}	
+	
+	
+	
+	if(LSF_Raise_Or_Lower_Negative==1)
+	{
+		if(servoCurrData[LSF].curr>LSF_RAISE_LIMIT_NEGATIVE)
+		{
+			servoCurrData[LSF].curr--;
+		}
+		else if(servoCurrData[LSF].curr==LSF_RAISE_LIMIT_NEGATIVE)
+		{
+			LSF_Raise_Or_Lower_Negative=0;
+		}
+	}
+	else if(LSF_Raise_Or_Lower_Negative==0)
+	{
+		if(servoCurrData[LSF].curr<ARM_LSF_POS_HOME)
+		{
+		  servoCurrData[LSF].curr++;
+		}
+		else if(servoCurrData[LSF].curr==ARM_LSF_POS_HOME)
+		{
+			LSF_Raise_Or_Lower_Negative=1;
+		}
+	}	
+	
+
+
+	if(LSL_Raise_Or_Lower_Positive==1)
+	{
+		if(servoCurrData[LSL].curr<LSL_RAISE_LIMIT_POSITIVE)
+		{
+			servoCurrData[LSL].curr++;
+		}
+		else if(servoCurrData[LSL].curr==LSL_RAISE_LIMIT_POSITIVE)
+		{
+			LSL_Raise_Or_Lower_Positive=0;
+		}
+	}
+	else if(LSL_Raise_Or_Lower_Positive==0)
+	{
+		if(servoCurrData[LSL].curr>ARM_LSL_POS_HOME)
+		{
+		  servoCurrData[LSL].curr--;
+		}
+		else if(servoCurrData[LSL].curr==ARM_LSL_POS_HOME)
+		{
+			LSL_Raise_Or_Lower_Positive=1;
+		}
+	}	
+	
+	/*
+	if(ActuationDemo_SubState==0)
     {
       if(substate0_NAZ_LeftToRight==999)
       {
@@ -881,6 +993,7 @@ void choreo_state_actuation_demo(void)
         }                             
       }                                                                                  
     }
+	*/
     
     UpdateServos();
   }
