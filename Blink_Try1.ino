@@ -207,8 +207,8 @@ void moveHome_allServos1by1(void)
     delay(DELAY_BETWEEN_SERVOS_HOME_COMING);
   }
 
-  motorLeft.run(GO_FWD);
-  motorRight.run(GO_FWD); 
+  motorLeft.run(GO_BACK);
+  motorRight.run(GO_BACK); 
 }
 
 int StateEndProcess=NORMAL_RUNNING_TIME_OF_STATE;
@@ -560,6 +560,12 @@ void choreo_state_actuation_demo(void)
 
   #define LSL_RAISE_LIMIT_POSITIVE 95
   static int LSL_Raise_Or_Lower_Positive=1;  
+  
+  #define REL_RAISE_LIMIT_NEGATIVE 80
+  static int REL_Raise_Or_Lower_Negative=1; 
+  
+  #define LEL_RAISE_LIMIT_POSTIVE 98
+  static int LEL_Raise_Or_Lower_Positive=1;   
   //
 
   if(actuation_demo_driveMotorctr++>=2500)
@@ -661,6 +667,53 @@ void choreo_state_actuation_demo(void)
 		else if(servoCurrData[LSL].curr==ARM_LSL_POS_HOME)
 		{
 			LSL_Raise_Or_Lower_Positive=1;
+		}
+	}	
+	
+	if(REL_Raise_Or_Lower_Negative==1)
+	{
+		if(servoCurrData[REL].curr>REL_RAISE_LIMIT_NEGATIVE)
+		{
+			servoCurrData[REL].curr--;
+		}
+		else if(servoCurrData[REL].curr==REL_RAISE_LIMIT_NEGATIVE)
+		{
+			REL_Raise_Or_Lower_Negative=0;
+		}
+	}
+	else if(REL_Raise_Or_Lower_Negative==0)
+	{
+		if(servoCurrData[REL].curr<ARM_REL_POS_HOME)
+		{
+		  servoCurrData[REL].curr++;
+		}
+		else if(servoCurrData[REL].curr==ARM_REL_POS_HOME)
+		{
+			REL_Raise_Or_Lower_Negative=1;
+		}
+	}	
+	
+	
+	if(LEL_Raise_Or_Lower_Positive==1)
+	{
+		if(servoCurrData[LEL].curr<LEL_RAISE_LIMIT_POSTIVE)
+		{
+			servoCurrData[LEL].curr++;
+		}
+		else if(servoCurrData[LEL].curr==LEL_RAISE_LIMIT_POSTIVE)
+		{
+			LEL_Raise_Or_Lower_Positive=0;
+		}
+	}
+	else if(LEL_Raise_Or_Lower_Positive==0)
+	{
+		if(servoCurrData[LEL].curr>ARM_LEL_POS_HOME)
+		{
+		  servoCurrData[LEL].curr--;
+		}
+		else if(servoCurrData[LEL].curr==ARM_LEL_POS_HOME)
+		{
+			LEL_Raise_Or_Lower_Positive=1;
 		}
 	}	
 	
