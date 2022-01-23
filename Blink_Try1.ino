@@ -207,8 +207,8 @@ void moveHome_allServos1by1(void)
     delay(DELAY_BETWEEN_SERVOS_HOME_COMING);
   }
 
-  motorLeft.run(GO_BACK);
-  motorRight.run(GO_BACK); 
+  //motorLeft.run(GO_BACK);
+  //motorRight.run(GO_BACK); 
 }
 
 int StateEndProcess=NORMAL_RUNNING_TIME_OF_STATE;
@@ -569,6 +569,10 @@ void choreo_state_actuation_demo(void)
     
   static int NAZ_movement=0;
   static int NEL_movement=1;
+  
+  static int driveStateChangeCtr=0;
+  static int driveDirection=0;
+  static int driveBACKWARDStoFWD_swing=1;
   //
 
   if(actuation_demo_driveMotorctr++>=2500)
@@ -765,6 +769,61 @@ void choreo_state_actuation_demo(void)
 			NAZ_movement=1;
 		}
 	}	
+	
+	
+	if(driveStateChangeCtr++>100)
+	{
+		driveStateChangeCtr=0;
+		
+		if(driveBACKWARDStoFWD_swing==1)
+		{
+			if(driveDirection==0)
+			{
+				driveDirection=1;
+			}
+			else if(driveDirection==1)
+			{
+				driveDirection=0;
+				driveBACKWARDStoFWD_swing=0;
+			}
+			else if(driveDirection==2)
+			{
+				driveDirection=0;
+			}
+		}
+		else if(driveBACKWARDStoFWD_swing==0)
+		{
+			if(driveDirection==0)
+			{
+				driveDirection=2;
+			}
+			else if(driveDirection==2)
+			{
+				driveDirection=0;
+				driveBACKWARDStoFWD_swing=1;
+			}
+			else if(driveDirection==1)
+			{
+				driveDirection=0;
+			}
+		}
+		
+		if(driveDirection==0)
+		{
+			motorLeft.run(RELEASE);
+			motorRight.run(RELEASE);
+		}
+		else if(driveDirection==1)
+		{
+			motorLeft.run(GO_FWD);
+			motorRight.run(GO_FWD);
+		}
+		else if(driveDirection==2)
+		{
+			motorLeft.run(GO_BACK);
+			motorRight.run(GO_BACK);
+		}		
+	}
 	
 	/*
 	if(ActuationDemo_SubState==0)
