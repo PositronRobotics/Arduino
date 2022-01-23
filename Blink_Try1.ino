@@ -566,6 +566,9 @@ void choreo_state_actuation_demo(void)
   
   #define LEL_RAISE_LIMIT_POSTIVE 98
   static int LEL_Raise_Or_Lower_Positive=1;   
+    
+  static int NAZ_movement=0;
+  static int NEL_movement=1;
   //
 
   if(actuation_demo_driveMotorctr++>=2500)
@@ -714,6 +717,52 @@ void choreo_state_actuation_demo(void)
 		else if(servoCurrData[LEL].curr==ARM_LEL_POS_HOME)
 		{
 			LEL_Raise_Or_Lower_Positive=1;
+		}
+	}
+
+	if(NEL_movement==1)
+	{
+		if(servoCurrData[NEL].curr>NEL_TOP_MOST)
+		{
+			servoCurrData[NEL].curr--;
+		}
+		else if(servoCurrData[NEL].curr==NEL_TOP_MOST)
+		{
+			NEL_movement=0;
+		}
+	}
+	else if(NEL_movement==0)
+	{
+		if(servoCurrData[NEL].curr<NEL_BOTTOM_MOST)
+		{
+		  servoCurrData[NEL].curr++;
+		}
+		else if(servoCurrData[NEL].curr==NEL_BOTTOM_MOST)
+		{
+			NEL_movement=1;
+		}
+	}
+	
+	if(NAZ_movement==1)
+	{
+		if(servoCurrData[NAZ].curr<NAZ_LEFT_MOST)
+		{
+			servoCurrData[NAZ].curr++;
+		}
+		else if(servoCurrData[NAZ].curr==NAZ_LEFT_MOST)
+		{
+			NAZ_movement=0;
+		}
+	}
+	else if(NAZ_movement==0)
+	{
+		if(servoCurrData[NAZ].curr>NAZ_RIGHT_MOST)
+		{
+		  servoCurrData[NAZ].curr--;
+		}
+		else if(servoCurrData[NAZ].curr==NAZ_RIGHT_MOST)
+		{
+			NAZ_movement=1;
 		}
 	}	
 	
