@@ -28,7 +28,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.print("program start:19-mar:100");
+  Serial.print("program start:19-mar:101");
   Serial.println();  
 
   Wire.begin(8);
@@ -37,30 +37,7 @@ void setup()
 
 void loop()
 {
-  /*if((prev_m1==0) && (curr_m1==1))
-  {
-    move_home_process=MOVING_TO_HOME_POS;    
-    prev_m1=curr_m1;    
-    
-    servoElbowRight.attach(11);
-    servoElbowRight.write(SERVOELBOWRIGHT_POS_HOME);
-    Serial.println("servoElbowRight");
-    delay(5000);
-
-    servoShoulderRightLateral.attach(10);
-    servoShoulderRightLateral.write(SERVOSHOULDERRIGHTLATERAL_POS_HOME);
-    Serial.println("servoShoulderRightLateral_pos");
-    delay(5000);
-
-    servoShoulderRightFrontal.attach(9);
-    servoShoulderRightFrontal.write(SERVOSHOULDERRIGHTFRONT_POS_HOME);
-    Serial.println("servoShoulderRightFrontal");
-    delay(5000);
-
-    move_home_process=MOVED_TO_HOME_POS;
-  }*/
-
-  Serial.print("In loop:25-mar:101");
+  Serial.print("In loop:22-apr:101");
   Serial.println();
 
   delay(2000);
@@ -70,10 +47,6 @@ void loop()
 void receiveEvent(int howMany)
 {
   String rcmd="";
-
-  char angleStr[4];
-  int angle=0;
-  int m1=0;
   
   while (0 <Wire.available())
   {
@@ -82,41 +55,4 @@ void receiveEvent(int howMany)
   Serial.print("Recd Cmd:");
   Serial.print(rcmd);
   Serial.println();
-
-  /*if((rcmd[0]=='m') && (rcmd[1]=='1'))
-  {
-    m1=(rcmd.substring(3,4)).toInt();
-    Serial.print("m1=");
-    Serial.print(m1);
-    Serial.println();
-    
-    if(move_home_process!=MOVING_TO_HOME_POS)
-    {
-      Serial.println("Assigned to curr_m1");
-      curr_m1=m1;      
-    }
-  }
-  else
-  {
-    if(move_home_process==MOVED_TO_HOME_POS)
-    {    
-      angleStr[0]=rcmd[0];
-      angleStr[1]=rcmd[1];
-      angleStr[2]=rcmd[2];
-      angleStr[3]=rcmd[3];
-    
-      Serial.print("angleStr:");
-      Serial.print(angleStr);
-      Serial.println();  
-    
-      Serial.print("angle:");
-      sscanf(angleStr,"%04d",&angle);
-      Serial.print(angle);
-    
-      servoShoulderRightFrontal.write(angle);
-      
-      //Serial.print(rcmd.substring(3,4));
-      Serial.println();
-    }
-  }*/
 }
