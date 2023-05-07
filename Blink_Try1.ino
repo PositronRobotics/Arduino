@@ -21,7 +21,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.print("program start:23APR:102");
+  Serial.print("program start:7may:100");
   Serial.println();
 
   motorLeft.setSpeed(255); 
@@ -35,9 +35,9 @@ void setup()
 
 void loop()
 {
-  Serial.print("In loop:22-apr:105");
-  Serial.println();
-  delay(200);
+  //Serial.print("In loop:7may:101");
+  //Serial.println();
+  delay(100);
   
   if(trig==1)
   {
@@ -89,6 +89,7 @@ void loop()
     }
     else if(currDir==STOPPED)
     {
+      Serial.println("STOPPED");
       motorLeft.run(RELEASE);
       motorRight.run(RELEASE);             
     }
