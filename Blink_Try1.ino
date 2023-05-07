@@ -13,6 +13,7 @@
 int currDir=STOPPED;
 int currSteering=STRAIGHT;
 int trig=0;
+int KeepAlive_came=0;
 
 AF_DCMotor motorLeft(4);
 AF_DCMotor motorRight(3);
@@ -38,60 +39,84 @@ void loop()
   //Serial.print("In loop:7may:101");
   //Serial.println();
   delay(100);
-  
-  if(trig==1)
+
+  static int smallCounter=0;
+  int stoppedForever=0;
+
+  if(smallCounter++>=10)
   {
-    trig=0;
+    smallCounter=0;
 
-    Serial.println("Trigger came");
-
-    if(currDir==FORWARD)
+    if(KeepAlive_came==1)
     {
-      if(currSteering==STRAIGHT)
-      {
-        Serial.println("FWD");
-        motorLeft.run(FORWARD);
-        motorRight.run(FORWARD); 
-      }
-      else if(currSteering==LEFT)
-      {
-        Serial.println("FWD-LEFT");
-        motorLeft.run(RELEASE);
-        motorRight.run(FORWARD); 
-      }
-      else if(currSteering==RIGHT)
-      {
-        Serial.println("FWD-RIGHT");
-        motorLeft.run(FORWARD);
-        motorRight.run(RELEASE); 
-      }        
+      KeepAlive_came=0;
+      stoppedForever=0;
     }
-    else if(currDir==BACK)
+    else
     {
-      if(currSteering==STRAIGHT)
-      {
-        Serial.println("BACK");
-        motorLeft.run(BACKWARD);
-        motorRight.run(BACKWARD); 
-      }
-      else if(currSteering==LEFT)
-      {
-        Serial.println("BACK-LEFT");
-        motorLeft.run(RELEASE);
-        motorRight.run(BACKWARD); 
-      }
-      else if(currSteering==RIGHT)
-      {
-        Serial.println("BACK-RIGHT");
-        motorLeft.run(BACKWARD);
-        motorRight.run(RELEASE); 
-      }        
-    }
-    else if(currDir==STOPPED)
-    {
+      stoppedForever=1;
       Serial.println("STOPPED");
       motorLeft.run(RELEASE);
-      motorRight.run(RELEASE);             
+      motorRight.run(RELEASE);  
+    }
+  }
+  
+  if(stoppedForever==0)
+  {
+    if(trig==1)
+    {
+      trig=0;
+  
+      Serial.println("Trigger came");
+  
+      if(currDir==FORWARD)
+      {
+        if(currSteering==STRAIGHT)
+        {
+          Serial.println("FWD");
+          motorLeft.run(FORWARD);
+          motorRight.run(FORWARD); 
+        }
+        else if(currSteering==LEFT)
+        {
+          Serial.println("FWD-LEFT");
+          motorLeft.run(RELEASE);
+          motorRight.run(FORWARD); 
+        }
+        else if(currSteering==RIGHT)
+        {
+          Serial.println("FWD-RIGHT");
+          motorLeft.run(FORWARD);
+          motorRight.run(RELEASE); 
+        }        
+      }
+      else if(currDir==BACK)
+      {
+        if(currSteering==STRAIGHT)
+        {
+          Serial.println("BACK");
+          motorLeft.run(BACKWARD);
+          motorRight.run(BACKWARD); 
+        }
+        else if(currSteering==LEFT)
+        {
+          Serial.println("BACK-LEFT");
+          motorLeft.run(RELEASE);
+          motorRight.run(BACKWARD); 
+        }
+        else if(currSteering==RIGHT)
+        {
+          Serial.println("BACK-RIGHT");
+          motorLeft.run(BACKWARD);
+          motorRight.run(RELEASE); 
+        }        
+      }
+      else if(currDir==STOPPED)
+      {
+        Serial.println("STOPPED");
+        motorLeft.run(RELEASE);
+        motorRight.run(RELEASE);             
+      }
     }
   }
 }
@@ -105,9 +130,14 @@ void receiveEvent(int howMany)
   {
     rcmd += (char)Wire.read();
   }
-  Serial.print("Recd Cmd:");
-  Serial.print(rcmd);
-  Serial.println();
+  //Serial.print("Recd Cmd:");
+  //Serial.print(rcmd);
+  //Serial.println();
+
+  if(rcmd[0]=='A')
+  {
+    KeepAlive_came=1;
+  }
 
   if((rcmd[0]=='u')||(rcmd[0]=='n')||(rcmd[0]=='h')||(rcmd[0]=='j'))
   {
