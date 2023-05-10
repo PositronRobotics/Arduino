@@ -57,7 +57,10 @@ void loop()
       stoppedForever=1;
       Serial.println("STOPPED");
       motorLeft.run(RELEASE);
-      motorRight.run(RELEASE);  
+      motorRight.run(RELEASE);
+
+      currDir=STOPPED;
+      currSteering=STRAIGHT;      
     }
   }
   
@@ -115,7 +118,10 @@ void loop()
       {
         Serial.println("STOPPED");
         motorLeft.run(RELEASE);
-        motorRight.run(RELEASE);             
+        motorRight.run(RELEASE);
+
+        currDir=STOPPED;
+        currSteering=STRAIGHT;                       
       }
     }
   }
