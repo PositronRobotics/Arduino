@@ -22,7 +22,7 @@ Servo servoShoulderLeftLateral;
 Servo servoShoulderLeftFrontal;
 Servo servoElbowLeft;
 
-int servoShoulderLeftLateral_pos = 41;
+int servoShoulderLeftLateral_pos = 38;
 int servoShoulderLeftFrontal_pos = 109;
 int servoElbowLeft_pos = 67;
 
@@ -36,7 +36,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.print("program start:7may:100");
+  Serial.print("program start:17sep:100");
   Serial.println();
 
   motorLeft.setSpeed(255); 
@@ -60,7 +60,7 @@ void loop()
 {
   //Serial.print("In loop:7may:101");
   //Serial.println();
-  delay(100);
+  //delay(100);
 
   static int smallCounter=0;
   int stoppedForever=0;
@@ -77,7 +77,7 @@ void loop()
     else
     {
       stoppedForever=1;
-      Serial.println("STOPPED");
+      //Serial.println("STOPPED");
       motorLeft.run(RELEASE);
       motorRight.run(RELEASE);
 
@@ -92,7 +92,7 @@ void loop()
     {
       trig=0;
   
-      Serial.println("Trigger came");
+      //Serial.println("Trigger came");
   
       if(currDir==FORWARD)
       {
@@ -138,7 +138,7 @@ void loop()
       }
       else if(currDir==STOPPED)
       {
-        Serial.println("STOPPED");
+        //Serial.println("STOPPED");
         motorLeft.run(RELEASE);
         motorRight.run(RELEASE);
 
@@ -153,8 +153,8 @@ void loop()
     serInput=0;
     serInput = Serial.read();
 
-    Serial.print("Received:");
-    Serial.println(serInput);
+    //Serial.print("Received:");
+    //Serial.println(serInput);
 
     if((serInput==97)||(serInput==122)||(serInput==115)||(serInput==120)||(serInput==100)||(serInput==99))
     {
