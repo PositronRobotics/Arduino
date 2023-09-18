@@ -18,19 +18,35 @@ int KeepAlive_came=0;
 AF_DCMotor motorLeft(4);
 AF_DCMotor motorRight(3);
 
-Servo servoShoulderLeftLateral;
-Servo servoShoulderLeftFrontal;
-Servo servoElbowLeft;
+Servo servoLegFoot;
+Servo servoLegKnee;
+Servo servoLegHip;
 
-int servoShoulderLeftLateral_pos = 38;
-int servoShoulderLeftFrontal_pos = 109;
-int servoElbowLeft_pos = 67;
+#define SERVOLEGFOOT_UPRIGHT_POS 38
+#define SERVOLEGKNEE_UPRIGHT_POS 109
+#define SERVOLEGHIP_UPRIGHT_POS 67
 
-int prev_servoShoulderLeftLateral_pos = 0;
-int prev_servoShoulderLeftFrontal_pos = 0;
-int prev_servoElbowLeft_pos = 0;
+#define SERVOLEGFOOT_SQUATTED_DOWN_1_POS 154
+#define SERVOLEGKNEE_SQUATTED_DOWN_1_POS 5
+#define SERVOLEGHIP_SQUATTED_DOWN_1_POS 56
+
+int servoLegFoot_pos = SERVOLEGFOOT_UPRIGHT_POS;
+int servoLegKnee_pos = SERVOLEGKNEE_UPRIGHT_POS;
+int servoLegHip_pos = SERVOLEGHIP_UPRIGHT_POS;
+
+int prev_servoLegFoot_pos = 0;
+int prev_servoLegKnee_pos = 0;
+int prev_servoLegHip_pos = 0;
 
 char serInput=0;
+
+#define UPRIGHT 0
+#define SQUATTING_DOWN_1 1
+#define SQUATTING_DOWN_2 2
+#define SQUATTING_UP_1 3
+#define SQUATTING_UP_2 4
+
+int squatState=UPRIGHT;
 
 void setup()
 {
@@ -44,13 +60,13 @@ void setup()
   motorRight.setSpeed(255); 
   motorRight.run(RELEASE);  
   
-  servoShoulderLeftLateral.attach(9);  // attaches the servo on pin 9 to the servo object
-  servoShoulderLeftFrontal.attach(10);
-  servoElbowLeft.attach(11);
+  servoLegFoot.attach(9);  // attaches the servo on pin 9 to the servo object
+  servoLegKnee.attach(10);
+  servoLegHip.attach(11);
   
-  servoShoulderLeftLateral.write(servoShoulderLeftLateral_pos);
-  servoShoulderLeftFrontal.write(servoShoulderLeftFrontal_pos);
-  servoElbowLeft.write(servoElbowLeft_pos);  
+  servoLegFoot.write(servoLegFoot_pos);
+  servoLegKnee.write(servoLegKnee_pos);
+  servoLegHip.write(servoLegHip_pos);  
 
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
@@ -160,73 +176,98 @@ void loop()
     {
       if(serInput==97)
       {
-        if(servoShoulderLeftLateral_pos<180)
+        if(servoLegFoot_pos<180)
         {
-          servoShoulderLeftLateral_pos++;
+          servoLegFoot_pos++;
         }
       }
       else if(serInput==122)
       {
-        if(servoShoulderLeftLateral_pos>0)
+        if(servoLegFoot_pos>0)
         {
-          servoShoulderLeftLateral_pos--;
+          servoLegFoot_pos--;
         }
       }
       else if(serInput==115)
       {
-        if(servoShoulderLeftFrontal_pos<180)
+        if(servoLegKnee_pos<180)
         {
-          servoShoulderLeftFrontal_pos++;
+          servoLegKnee_pos++;
         }
       }
       else if(serInput==120)
       {
-        if(servoShoulderLeftFrontal_pos>0)
+        if(servoLegKnee_pos>0)
         {
-          servoShoulderLeftFrontal_pos--;
+          servoLegKnee_pos--;
         }
       }
       else if(serInput==100)
       {
-        if(servoElbowLeft_pos<180)
+        if(servoLegHip_pos<180)
         {
-          servoElbowLeft_pos++;
+          servoLegHip_pos++;
         }
       }
       else if(serInput==99)
       {
-        if(servoElbowLeft_pos>0)
+        if(servoLegHip_pos>0)
         {
-          servoElbowLeft_pos--;
+          servoLegHip_pos--;
         }
       }
 
-      Serial.print("servoShoulderLeftLateral_pos:");
-      Serial.print(servoShoulderLeftLateral_pos);
-      Serial.print(" ;servoShoulderLeftFrontal_pos:");
-      Serial.print(servoShoulderLeftFrontal_pos);
-      Serial.print(" ;servoElbowLeft_pos:");
-      Serial.println(servoElbowLeft_pos);            
-
-      if(prev_servoShoulderLeftLateral_pos!=servoShoulderLeftLateral_pos)
+      Serial.print("servoLegFoot_pos:");
+      Serial.print(servoLegFoot_pos);
+      Serial.print(" ;servoLegKnee_pos:");
+      Serial.print(servoLegKnee_pos);
+      Serial.print(" ;servoLegHip_pos:");
+      Serial.println(servoLegHip_pos);              
+    }
+    else
+    {
+      if(serInput==48)  
       {
-        prev_servoShoulderLeftLateral_pos=servoShoulderLeftLateral_pos;
-        servoShoulderLeftLateral.write(servoShoulderLeftLateral_pos);
+        if(squatState==UPRIGHT)
+        {
+          squatState=SQUATTING_DOWN_1;
+        }
       }
-
-      if(prev_servoShoulderLeftFrontal_pos!=servoShoulderLeftFrontal_pos)
-      {
-        prev_servoShoulderLeftFrontal_pos=servoShoulderLeftFrontal_pos;
-        servoShoulderLeftFrontal.write(servoShoulderLeftFrontal_pos);
-      }  
-
-      if(prev_servoElbowLeft_pos!=servoElbowLeft_pos)
-      {
-        prev_servoElbowLeft_pos=servoElbowLeft_pos;
-        servoElbowLeft.write(servoElbowLeft_pos);
-      }  
-    }  
+    }
 	}
+
+  //Update all Servos via PWM
+  if(squatState==SQUATTING_DOWN_1)
+  {
+    if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_1_POS)
+    {
+      servoLegFoot_pos++;
+      servoLegKnee_pos--;
+      delay(100);
+    }
+    else
+    {
+      squatState=SQUATTING_DOWN_2;
+    }
+  }
+
+  if(prev_servoLegFoot_pos!=servoLegFoot_pos)
+  {
+    prev_servoLegFoot_pos=servoLegFoot_pos;
+    servoLegFoot.write(servoLegFoot_pos);
+  }
+  
+  if(prev_servoLegKnee_pos!=servoLegKnee_pos)
+  {
+    prev_servoLegKnee_pos=servoLegKnee_pos;
+    servoLegKnee.write(servoLegKnee_pos);
+  }  
+
+  if(prev_servoLegHip_pos!=servoLegHip_pos)
+  {
+    prev_servoLegHip_pos=servoLegHip_pos;
+    servoLegHip.write(servoLegHip_pos);
+  }  
 }
 
 // function that executes whenever data is received from master
