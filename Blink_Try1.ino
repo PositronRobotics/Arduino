@@ -292,6 +292,9 @@ void leg_transitionThruToTargetState()
 {
   cur_step=1;
   num_steps=calc_num_steps();
+
+  Serial.print("num_steps:");
+  Serial.println(num_steps);  
   
   increment_LEGFOOT = (float)(target_servoLegFoot_pos - servoLegFoot_pos) / num_steps;
   increment_LEGKNEE = (float)(target_servoLegKnee_pos - servoLegKnee_pos) / num_steps;
