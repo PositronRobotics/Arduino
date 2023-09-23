@@ -261,7 +261,7 @@ void takeSerialInput()
       {
         if(squatState==SQUATTED_DOWN_MID)
         {
-          squatState=UPRIGHT;
+          target_squatState=UPRIGHT;
         }
       }      
     }
@@ -285,7 +285,7 @@ int maxOf3(int a, int b, int c)
 
 int calc_num_steps()
 {
-  return maxOf3((int)(target_servoLegFoot_pos - servoLegFoot_pos),(int)(target_servoLegKnee_pos - servoLegKnee_pos),(int)(target_servoLegHip_pos - servoLegHip_pos));
+  return maxOf3((abs((int)(target_servoLegFoot_pos - servoLegFoot_pos))),(abs((int)(target_servoLegKnee_pos - servoLegKnee_pos))),(abs((int)(target_servoLegHip_pos - servoLegHip_pos))));
 }
 
 void leg_transitionThruToTargetState()
@@ -339,17 +339,26 @@ void leg_transitionThruToTargetState()
 
 void legManuevers()
 {
-  if((squatState==UPRIGHT)&&(target_squatState==SQUATTED_DOWN_MID))
+  if(squatState!=target_squatState)
   {
     Serial.print("squatState:");
     Serial.print(squatState);
     Serial.print("target_squatState:");
     Serial.println(target_squatState);
-            
-    target_servoLegFoot_pos=SERVOLEGFOOT_SQUATTED_DOWN_MID_POS;
-    target_servoLegKnee_pos=SERVOLEGKNEE_SQUATTED_DOWN_MID_POS;
-    target_servoLegHip_pos=SERVOLEGHIP_SQUATTED_DOWN_MID_POS;
     
+    if((squatState==UPRIGHT)&&(target_squatState==SQUATTED_DOWN_MID))
+    {              
+      target_servoLegFoot_pos=SERVOLEGFOOT_SQUATTED_DOWN_MID_POS;
+      target_servoLegKnee_pos=SERVOLEGKNEE_SQUATTED_DOWN_MID_POS;
+      target_servoLegHip_pos=SERVOLEGHIP_SQUATTED_DOWN_MID_POS;
+    }
+    else if((squatState==SQUATTED_DOWN_MID)&&(target_squatState==UPRIGHT))
+    {              
+      target_servoLegFoot_pos=SERVOLEGFOOT_UPRIGHT_POS;
+      target_servoLegKnee_pos=SERVOLEGKNEE_UPRIGHT_POS;
+      target_servoLegHip_pos=SERVOLEGHIP_UPRIGHT_POS;
+    }
+
     leg_transitionThruToTargetState();
   }
 }
