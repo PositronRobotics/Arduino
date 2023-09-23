@@ -26,9 +26,13 @@ Servo servoLegHip;
 #define SERVOLEGKNEE_UPRIGHT_POS 109
 #define SERVOLEGHIP_UPRIGHT_POS 67
 
-#define SERVOLEGFOOT_SQUATTED_DOWN_1_POS 154
+#define SERVOLEGFOOT_SQUATTED_DOWN_1_POS 142
 #define SERVOLEGKNEE_SQUATTED_DOWN_1_POS 5
-#define SERVOLEGHIP_SQUATTED_DOWN_1_POS 56
+#define SERVOLEGHIP_SQUATTED_DOWN_1_POS 50
+
+#define SERVOLEGFOOT_SQUATTED_DOWN_2_POS 154
+#define SERVOLEGKNEE_SQUATTED_DOWN_2_POS 5
+#define SERVOLEGHIP_SQUATTED_DOWN_2_POS 56
 
 int servoLegFoot_pos = SERVOLEGFOOT_UPRIGHT_POS;
 int servoLegKnee_pos = SERVOLEGKNEE_UPRIGHT_POS;
@@ -43,8 +47,9 @@ char serInput=0;
 #define UPRIGHT 0
 #define SQUATTING_DOWN_1 1
 #define SQUATTING_DOWN_2 2
-#define SQUATTING_UP_1 3
-#define SQUATTING_UP_2 4
+#define SQUATTED 3
+#define SQUATTING_UP_1 4
+#define SQUATTING_UP_2 5
 
 int squatState=UPRIGHT;
 
@@ -236,21 +241,43 @@ void loop()
     }
 	}
 
-  //Update all Servos via PWM
   if(squatState==SQUATTING_DOWN_1)
   {
     if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_1_POS)
     {
       servoLegFoot_pos++;
       servoLegKnee_pos--;
-      delay(100);
+
+      if(servoLegFoot_pos%6==0)
+      {
+          servoLegHip_pos--;
+      }                  
+      delay(50);
     }
     else
     {
       squatState=SQUATTING_DOWN_2;
     }
   }
+  else if(squatState==SQUATTING_DOWN_2)
+  {
+    if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_2_POS)
+    {
+      servoLegFoot_pos++;
 
+      if(servoLegFoot_pos%2==0)
+      {
+          servoLegHip_pos++;
+      }                  
+      delay(50);
+    }
+    else
+    {
+      squatState=SQUATTED;
+    }    
+  }
+
+  //Update all Servos via PWM
   if(prev_servoLegFoot_pos!=servoLegFoot_pos)
   {
     prev_servoLegFoot_pos=servoLegFoot_pos;
