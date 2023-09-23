@@ -293,6 +293,23 @@ void leg_transitionThruToTargetState()
   cur_step=1;
   num_steps=calc_num_steps();
 
+  Serial.print("servoLegFoot_pos:");
+  Serial.print((int)servoLegFoot_pos);
+  Serial.print("target_servoLegFoot_pos:");
+  Serial.println((int)target_servoLegFoot_pos);
+  
+  Serial.print("servoLegKnee_pos:");
+  Serial.print((int)servoLegKnee_pos);
+  Serial.print("target_servoLegKnee_pos:");
+  Serial.println((int)target_servoLegKnee_pos);
+  
+  Serial.print("servoLegHip_pos:");
+  Serial.print((int)servoLegHip_pos);
+  Serial.print("target_servoLegHip_pos:");
+  Serial.println((int)target_servoLegHip_pos);        
+  
+  Serial.println("-------");  
+
   Serial.print("num_steps:");
   Serial.println(num_steps);  
   
@@ -333,22 +350,6 @@ void legManuevers()
     target_servoLegKnee_pos=SERVOLEGKNEE_SQUATTED_DOWN_MID_POS;
     target_servoLegHip_pos=SERVOLEGHIP_SQUATTED_DOWN_MID_POS;
     
-    Serial.print("servoLegFoot_pos:");
-    Serial.print((int)servoLegFoot_pos);
-    Serial.print("target_servoLegFoot_pos:");
-    Serial.println((int)target_servoLegFoot_pos);
-
-    Serial.print("servoLegKnee_pos:");
-    Serial.print((int)servoLegKnee_pos);
-    Serial.print("target_servoLegKnee_pos:");
-    Serial.println((int)target_servoLegKnee_pos);
-
-    Serial.print("servoLegHip_pos:");
-    Serial.print((int)servoLegHip_pos);
-    Serial.print("target_servoLegHip_pos:");
-    Serial.println((int)target_servoLegHip_pos);        
-
-    Serial.println("-------");
     leg_transitionThruToTargetState();
   }
 }
