@@ -45,16 +45,20 @@ float prev_servoLegHip_pos = 0;
 char serInput=0;
 
 #define UPRIGHT 0
-#define SQUATTING_DOWN_MID 1
-#define SQUATTING_DOWN_FULL 2
-#define SQUATTED 3
-#define SQUATTING_UP_MID 4
-#define SQUATTING_UP_FULL 5
+#define SQUATTED_DOWN_MID 1
+#define SQUATTED_DOWN_FULL 2
+#define SQUATTED_UP_MID 4
+#define SQUATTED_UP_FULL 5
 
 int squatState=UPRIGHT;
+int target_squatState=UPRIGHT;
 
 int num_steps = 116; // You can adjust this based on how fast you want the servos to move
 int cur_step=1;
+
+float target_servoLegFoot_pos=0;
+float target_servoLegKnee_pos=0;
+float target_servoLegHip_pos=0;
 
 float increment_LEGFOOT = 0;
 float increment_LEGKNEE = 0;
@@ -82,19 +86,15 @@ void setup()
 
   Wire.begin(8);
   Wire.onReceive(receiveI2C);
-
-  increment_LEGFOOT = (float)(SERVOLEGFOOT_SQUATTED_DOWN_MID_POS - SERVOLEGFOOT_UPRIGHT_POS) / num_steps;
-  increment_LEGKNEE = (float)(SERVOLEGKNEE_SQUATTED_DOWN_MID_POS - SERVOLEGKNEE_UPRIGHT_POS) / num_steps;
-  increment_LEGHIP = (float)(SERVOLEGHIP_SQUATTED_DOWN_MID_POS - SERVOLEGHIP_UPRIGHT_POS) / num_steps;  
-
-  Serial.print("increment_LEGFOOT:");
+  
+  /*Serial.print("increment_LEGFOOT:");
   Serial.print(increment_LEGFOOT);
 
   Serial.print("increment_LEGKNEE:");
   Serial.print(increment_LEGKNEE);
 
   Serial.print("increment_LEGHIP:");
-  Serial.print(increment_LEGHIP);  
+  Serial.print(increment_LEGHIP);  */
 }
 
 void DC_motorControl()
@@ -254,14 +254,14 @@ void takeSerialInput()
       {
         if(squatState==UPRIGHT)
         {
-          squatState=SQUATTING_DOWN_MID;
+          target_squatState=SQUATTED_DOWN_MID;
         }
       }
       else if(serInput==49)  
       {
-        if(squatState==SQUATTED)
+        if(squatState==SQUATTED_DOWN_MID)
         {
-          squatState=SQUATTING_UP_MID;
+          squatState=UPRIGHT;
         }
       }      
     }
@@ -270,8 +270,16 @@ void takeSerialInput()
 
 void legManuevers()
 {
-  if(squatState==SQUATTING_DOWN_MID)
+  if((squatState==UPRIGHT)&&(target_squatState==SQUATTED_DOWN_MID))
   {
+    target_servoLegFoot_pos=SERVOLEGFOOT_SQUATTED_DOWN_MID_POS;
+    target_servoLegKnee_pos=SERVOLEGKNEE_SQUATTED_DOWN_MID_POS;
+    target_servoLegHip_pos=SERVOLEGHIP_SQUATTED_DOWN_MID_POS;
+
+    increment_LEGFOOT = (float)(target_servoLegFoot_pos - servoLegFoot_pos) / num_steps;
+    increment_LEGKNEE = (float)(target_servoLegKnee_pos - servoLegKnee_pos) / num_steps;
+    increment_LEGHIP = (float)(target_servoLegHip_pos - servoLegHip_pos) / num_steps; 
+        
     if(cur_step<=num_steps)
     {                        
       servoLegFoot_pos=servoLegFoot_pos+increment_LEGFOOT;
