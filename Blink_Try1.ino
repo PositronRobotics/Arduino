@@ -53,7 +53,7 @@ char serInput=0;
 int squatState=UPRIGHT;
 int target_squatState=UPRIGHT;
 
-int num_steps = 116; // You can adjust this based on how fast you want the servos to move
+int num_steps = 0; // You can adjust this based on how fast you want the servos to move
 int cur_step=1;
 
 float target_servoLegFoot_pos=0;
@@ -268,56 +268,85 @@ void takeSerialInput()
   }
 }
 
+int maxOf3(int a, int b, int c)
+{
+    int max_value = a;
+
+    if (b > max_value) {
+        max_value = b;
+    }
+
+    if (c > max_value) {
+        max_value = c;
+    }
+
+    return max_value;
+}
+
+int calc_num_steps()
+{
+  return maxOf3((int)(target_servoLegFoot_pos - servoLegFoot_pos),(int)(target_servoLegKnee_pos - servoLegKnee_pos),(int)(target_servoLegHip_pos - servoLegHip_pos));
+}
+
+void leg_transitionThruToTargetState()
+{
+  cur_step=1;
+  num_steps=calc_num_steps();
+  
+  increment_LEGFOOT = (float)(target_servoLegFoot_pos - servoLegFoot_pos) / num_steps;
+  increment_LEGKNEE = (float)(target_servoLegKnee_pos - servoLegKnee_pos) / num_steps;
+  increment_LEGHIP = (float)(target_servoLegHip_pos - servoLegHip_pos) / num_steps; 
+      
+  for(int i=cur_step;i<=num_steps;i++)
+  {                        
+    servoLegFoot_pos=servoLegFoot_pos+increment_LEGFOOT;
+    servoLegKnee_pos=servoLegKnee_pos+increment_LEGKNEE;
+    servoLegHip_pos=servoLegHip_pos+increment_LEGHIP;
+  
+    Serial.print("servoLegFoot_pos:");
+    Serial.print((int)servoLegFoot_pos);
+    Serial.print(" ;servoLegKnee_pos:");
+    Serial.print((int)servoLegKnee_pos);
+    Serial.print(" ;servoLegHip_pos:");
+    Serial.println((int)servoLegHip_pos);
+
+    updateServos();
+        
+    delay(50);
+  }  
+  squatState=target_squatState;
+}
+
 void legManuevers()
 {
   if((squatState==UPRIGHT)&&(target_squatState==SQUATTED_DOWN_MID))
   {
+    Serial.print("squatState:");
+    Serial.print(squatState);
+    Serial.print("target_squatState:");
+    Serial.println(target_squatState);
+            
     target_servoLegFoot_pos=SERVOLEGFOOT_SQUATTED_DOWN_MID_POS;
     target_servoLegKnee_pos=SERVOLEGKNEE_SQUATTED_DOWN_MID_POS;
     target_servoLegHip_pos=SERVOLEGHIP_SQUATTED_DOWN_MID_POS;
+    
+    Serial.print("servoLegFoot_pos:");
+    Serial.print((int)servoLegFoot_pos);
+    Serial.print("target_servoLegFoot_pos:");
+    Serial.println((int)target_servoLegFoot_pos);
 
-    increment_LEGFOOT = (float)(target_servoLegFoot_pos - servoLegFoot_pos) / num_steps;
-    increment_LEGKNEE = (float)(target_servoLegKnee_pos - servoLegKnee_pos) / num_steps;
-    increment_LEGHIP = (float)(target_servoLegHip_pos - servoLegHip_pos) / num_steps; 
-        
-    if(cur_step<=num_steps)
-    {                        
-      servoLegFoot_pos=servoLegFoot_pos+increment_LEGFOOT;
-      servoLegKnee_pos=servoLegKnee_pos+increment_LEGKNEE;
-      servoLegHip_pos=servoLegHip_pos+increment_LEGHIP;
+    Serial.print("servoLegKnee_pos:");
+    Serial.print((int)servoLegKnee_pos);
+    Serial.print("target_servoLegKnee_pos:");
+    Serial.println((int)target_servoLegKnee_pos);
 
-      Serial.print("servoLegFoot_pos:");
-      Serial.print((int)servoLegFoot_pos);
-      Serial.print(" ;servoLegKnee_pos:");
-      Serial.print((int)servoLegKnee_pos);
-      Serial.print(" ;servoLegHip_pos:");
-      Serial.println((int)servoLegHip_pos);
+    Serial.print("servoLegHip_pos:");
+    Serial.print((int)servoLegHip_pos);
+    Serial.print("target_servoLegHip_pos:");
+    Serial.println((int)target_servoLegHip_pos);        
 
-      cur_step++;
-      
-      delay(50);
-    }
-    else
-    {
-      squatState=SQUATTING_DOWN_FULL;
-    }
-  }
-  else if(squatState==SQUATTING_DOWN_FULL)
-  {
-    if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_FULL_POS)
-    {
-      servoLegFoot_pos++;
-
-      if(((int)servoLegFoot_pos)%2==0)
-      {
-          servoLegHip_pos++;
-      }                  
-      delay(50);
-    }
-    else
-    {
-      squatState=SQUATTED;
-    }    
+    Serial.println("-------");
+    leg_transitionThruToTargetState();
   }
 }
 
@@ -346,8 +375,7 @@ void loop()
 {
   DC_motorControl();
   takeSerialInput();
-  legManuevers();
-  updateServos();  
+  legManuevers();  
 }
 
 // function that executes whenever data is received from master
