@@ -26,21 +26,21 @@ Servo servoLegHip;
 #define SERVOLEGKNEE_UPRIGHT_POS 109
 #define SERVOLEGHIP_UPRIGHT_POS 67
 
-#define SERVOLEGFOOT_SQUATTED_DOWN_1_POS 142
-#define SERVOLEGKNEE_SQUATTED_DOWN_1_POS 5
-#define SERVOLEGHIP_SQUATTED_DOWN_1_POS 50
+#define SERVOLEGFOOT_SQUATTED_DOWN_1_POS 157
+#define SERVOLEGKNEE_SQUATTED_DOWN_1_POS 0
+#define SERVOLEGHIP_SQUATTED_DOWN_1_POS 53
 
 #define SERVOLEGFOOT_SQUATTED_DOWN_2_POS 154
 #define SERVOLEGKNEE_SQUATTED_DOWN_2_POS 5
 #define SERVOLEGHIP_SQUATTED_DOWN_2_POS 56
 
-int servoLegFoot_pos = SERVOLEGFOOT_UPRIGHT_POS;
-int servoLegKnee_pos = SERVOLEGKNEE_UPRIGHT_POS;
-int servoLegHip_pos = SERVOLEGHIP_UPRIGHT_POS;
+float servoLegFoot_pos = SERVOLEGFOOT_UPRIGHT_POS;
+float servoLegKnee_pos = SERVOLEGKNEE_UPRIGHT_POS;
+float servoLegHip_pos = SERVOLEGHIP_UPRIGHT_POS;
 
-int prev_servoLegFoot_pos = 0;
-int prev_servoLegKnee_pos = 0;
-int prev_servoLegHip_pos = 0;
+float prev_servoLegFoot_pos = 0;
+float prev_servoLegKnee_pos = 0;
+float prev_servoLegHip_pos = 0;
 
 char serInput=0;
 
@@ -52,6 +52,13 @@ char serInput=0;
 #define SQUATTING_UP_2 5
 
 int squatState=UPRIGHT;
+
+int num_steps = 116; // You can adjust this based on how fast you want the servos to move
+int cur_step=1;
+
+float increment_LEGFOOT = (float)(SERVOLEGFOOT_SQUATTED_DOWN_1_POS - SERVOLEGFOOT_UPRIGHT_POS) / num_steps;
+float increment_LEGKNEE = (float)(SERVOLEGKNEE_SQUATTED_DOWN_1_POS - SERVOLEGKNEE_UPRIGHT_POS) / num_steps;
+float increment_LEGHIP = (float)(SERVOLEGHIP_SQUATTED_DOWN_1_POS - SERVOLEGHIP_UPRIGHT_POS) / num_steps;
 
 void setup()
 {
@@ -75,6 +82,15 @@ void setup()
 
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+
+  Serial.print("increment_LEGFOOT:");
+  Serial.print(increment_LEGFOOT);
+
+  Serial.print("increment_LEGKNEE:");
+  Serial.print(increment_LEGKNEE);
+
+  Serial.print("increment_LEGHIP:");
+  Serial.print(increment_LEGHIP);  
 }
 
 void loop()
@@ -243,20 +259,26 @@ void loop()
 
   if(squatState==SQUATTING_DOWN_1)
   {
-    if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_1_POS)
-    {
-      servoLegFoot_pos++;
-      servoLegKnee_pos--;
+    if(cur_step<=num_steps)
+    {                        
+      servoLegFoot_pos=servoLegFoot_pos+increment_LEGFOOT;
+      servoLegKnee_pos=servoLegKnee_pos+increment_LEGKNEE;
+      servoLegHip_pos=servoLegHip_pos+increment_LEGHIP;
 
-      if(servoLegFoot_pos%6==0)
-      {
-          servoLegHip_pos--;
-      }                  
+      Serial.print("servoLegFoot_pos:");
+      Serial.print((int)servoLegFoot_pos);
+      Serial.print(" ;servoLegKnee_pos:");
+      Serial.print((int)servoLegKnee_pos);
+      Serial.print(" ;servoLegHip_pos:");
+      Serial.println((int)servoLegHip_pos);
+
+      cur_step++;
+      
       delay(50);
     }
     else
     {
-      squatState=SQUATTING_DOWN_2;
+      squatState=SQUATTED;
     }
   }
   else if(squatState==SQUATTING_DOWN_2)
@@ -265,7 +287,7 @@ void loop()
     {
       servoLegFoot_pos++;
 
-      if(servoLegFoot_pos%2==0)
+      if(((int)servoLegFoot_pos)%2==0)
       {
           servoLegHip_pos++;
       }                  
@@ -281,19 +303,19 @@ void loop()
   if(prev_servoLegFoot_pos!=servoLegFoot_pos)
   {
     prev_servoLegFoot_pos=servoLegFoot_pos;
-    servoLegFoot.write(servoLegFoot_pos);
+    servoLegFoot.write((int)servoLegFoot_pos);
   }
   
   if(prev_servoLegKnee_pos!=servoLegKnee_pos)
   {
     prev_servoLegKnee_pos=servoLegKnee_pos;
-    servoLegKnee.write(servoLegKnee_pos);
+    servoLegKnee.write((int)servoLegKnee_pos);
   }  
 
   if(prev_servoLegHip_pos!=servoLegHip_pos)
   {
     prev_servoLegHip_pos=servoLegHip_pos;
-    servoLegHip.write(servoLegHip_pos);
+    servoLegHip.write((int)servoLegHip_pos);
   }  
 }
 
