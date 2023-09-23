@@ -26,13 +26,13 @@ Servo servoLegHip;
 #define SERVOLEGKNEE_UPRIGHT_POS 109
 #define SERVOLEGHIP_UPRIGHT_POS 67
 
-#define SERVOLEGFOOT_SQUATTED_DOWN_1_POS 157
-#define SERVOLEGKNEE_SQUATTED_DOWN_1_POS 0
-#define SERVOLEGHIP_SQUATTED_DOWN_1_POS 53
+#define SERVOLEGFOOT_SQUATTED_DOWN_MID_POS 157
+#define SERVOLEGKNEE_SQUATTED_DOWN_MID_POS 0
+#define SERVOLEGHIP_SQUATTED_DOWN_MID_POS 53
 
-#define SERVOLEGFOOT_SQUATTED_DOWN_2_POS 154
-#define SERVOLEGKNEE_SQUATTED_DOWN_2_POS 5
-#define SERVOLEGHIP_SQUATTED_DOWN_2_POS 56
+#define SERVOLEGFOOT_SQUATTED_DOWN_FULL_POS 154
+#define SERVOLEGKNEE_SQUATTED_DOWN_FULL_POS 5
+#define SERVOLEGHIP_SQUATTED_DOWN_FULL_POS 56
 
 float servoLegFoot_pos = SERVOLEGFOOT_UPRIGHT_POS;
 float servoLegKnee_pos = SERVOLEGKNEE_UPRIGHT_POS;
@@ -45,20 +45,20 @@ float prev_servoLegHip_pos = 0;
 char serInput=0;
 
 #define UPRIGHT 0
-#define SQUATTING_DOWN_1 1
-#define SQUATTING_DOWN_2 2
+#define SQUATTING_DOWN_MID 1
+#define SQUATTING_DOWN_FULL 2
 #define SQUATTED 3
-#define SQUATTING_UP_1 4
-#define SQUATTING_UP_2 5
+#define SQUATTING_UP_MID 4
+#define SQUATTING_UP_FULL 5
 
 int squatState=UPRIGHT;
 
 int num_steps = 116; // You can adjust this based on how fast you want the servos to move
 int cur_step=1;
 
-float increment_LEGFOOT = (float)(SERVOLEGFOOT_SQUATTED_DOWN_1_POS - SERVOLEGFOOT_UPRIGHT_POS) / num_steps;
-float increment_LEGKNEE = (float)(SERVOLEGKNEE_SQUATTED_DOWN_1_POS - SERVOLEGKNEE_UPRIGHT_POS) / num_steps;
-float increment_LEGHIP = (float)(SERVOLEGHIP_SQUATTED_DOWN_1_POS - SERVOLEGHIP_UPRIGHT_POS) / num_steps;
+float increment_LEGFOOT = 0;
+float increment_LEGKNEE = 0;
+float increment_LEGHIP = 0;
 
 void setup()
 {
@@ -81,7 +81,11 @@ void setup()
   servoLegHip.write(servoLegHip_pos);  
 
   Wire.begin(8);
-  Wire.onReceive(receiveEvent);
+  Wire.onReceive(receiveI2C);
+
+  increment_LEGFOOT = (float)(SERVOLEGFOOT_SQUATTED_DOWN_MID_POS - SERVOLEGFOOT_UPRIGHT_POS) / num_steps;
+  increment_LEGKNEE = (float)(SERVOLEGKNEE_SQUATTED_DOWN_MID_POS - SERVOLEGKNEE_UPRIGHT_POS) / num_steps;
+  increment_LEGHIP = (float)(SERVOLEGHIP_SQUATTED_DOWN_MID_POS - SERVOLEGHIP_UPRIGHT_POS) / num_steps;  
 
   Serial.print("increment_LEGFOOT:");
   Serial.print(increment_LEGFOOT);
@@ -93,12 +97,8 @@ void setup()
   Serial.print(increment_LEGHIP);  
 }
 
-void loop()
+void DC_motorControl()
 {
-  //Serial.print("In loop:7may:101");
-  //Serial.println();
-  //delay(100);
-
   static int smallCounter=0;
   int stoppedForever=0;
 
@@ -184,7 +184,10 @@ void loop()
       }
     }
   }
-  
+}
+
+void takeSerialInput()
+{
   if (Serial.available() > 0)
   {
     serInput=0;
@@ -251,13 +254,23 @@ void loop()
       {
         if(squatState==UPRIGHT)
         {
-          squatState=SQUATTING_DOWN_1;
+          squatState=SQUATTING_DOWN_MID;
         }
       }
+      else if(serInput==49)  
+      {
+        if(squatState==SQUATTED)
+        {
+          squatState=SQUATTING_UP_MID;
+        }
+      }      
     }
-	}
+  }
+}
 
-  if(squatState==SQUATTING_DOWN_1)
+void legManuevers()
+{
+  if(squatState==SQUATTING_DOWN_MID)
   {
     if(cur_step<=num_steps)
     {                        
@@ -278,12 +291,12 @@ void loop()
     }
     else
     {
-      squatState=SQUATTED;
+      squatState=SQUATTING_DOWN_FULL;
     }
   }
-  else if(squatState==SQUATTING_DOWN_2)
+  else if(squatState==SQUATTING_DOWN_FULL)
   {
-    if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_2_POS)
+    if(servoLegFoot_pos<SERVOLEGFOOT_SQUATTED_DOWN_FULL_POS)
     {
       servoLegFoot_pos++;
 
@@ -298,8 +311,10 @@ void loop()
       squatState=SQUATTED;
     }    
   }
+}
 
-  //Update all Servos via PWM
+void updateServos()
+{
   if(prev_servoLegFoot_pos!=servoLegFoot_pos)
   {
     prev_servoLegFoot_pos=servoLegFoot_pos;
@@ -316,11 +331,19 @@ void loop()
   {
     prev_servoLegHip_pos=servoLegHip_pos;
     servoLegHip.write((int)servoLegHip_pos);
-  }  
+  }
+}
+
+void loop()
+{
+  DC_motorControl();
+  takeSerialInput();
+  legManuevers();
+  updateServos();  
 }
 
 // function that executes whenever data is received from master
-void receiveEvent(int howMany)
+void receiveI2C(int howMany)
 {
   String rcmd="";
     
